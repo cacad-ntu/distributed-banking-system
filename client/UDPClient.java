@@ -68,15 +68,15 @@ class UDPClient
         ))));
     }
 
-	public void send(String message) throws IOException, InterruptedException{
+    public void send(String message) throws IOException, InterruptedException{
         // TODO: convert header packet as attribute
         List list = new ArrayList();
 
-		if(message.matches("[-+]?\\d*\\.\\d+"))
-			handler1(list,message);
-		else if(message.matches("[-+]?\\d+"))
-			handler2(list,message);
-		else
+        if(message.matches("[-+]?\\d*\\.\\d+"))
+            handler1(list,message);
+        else if(message.matches("[-+]?\\d+"))
+            handler2(list,message);
+        else
             handler3(list,message);
 
         byte[] bytes = Utils.byteUnboxing((Byte[])list.toArray(new Byte[list.size()]));
@@ -87,7 +87,7 @@ class UDPClient
         DatagramPacket sendPacket = new DatagramPacket(bytes, bytes.length, this.IPAddress, this.port);
         this.clientSocket.send(sendPacket);
     }
-	
+    
     public byte[] receive() throws IOException{
         // TODO: convert header packet as attribute
         byte[] header = new byte[4];
@@ -133,8 +133,8 @@ class UDPClient
             UDPClient udpClient = new UDPClient(args[0],Integer.parseInt(args[1]));
             Scanner scanner = new Scanner(System.in);
             while(true){
-				String message = scanner.nextLine();
-				udpClient.send(message);
+                String message = scanner.nextLine();
+                udpClient.send(message);
                 udpClient.handleResponse();
             }
         }
