@@ -3,8 +3,10 @@ package client;
 import java.io.*;
 
 class Utils{
-    public static byte[] marshal(String s) throws UnsupportedEncodingException{
-        return s.getBytes("UTF-8");
+     public static byte[] marshal(String s) throws UnsupportedEncodingException{
+	 byte[] ret = new byte[s.length()];
+	 for(int i=0;i<s.length();i++) ret[i] = (byte)s.charAt(i);
+	 return ret;
      }
 
      public static byte[] marshal(int x){
@@ -21,7 +23,9 @@ class Utils{
      }
 
      public static String unmarshalString(byte[] b){
-        return new String(b);
+	 char[] c = new char[b.length];
+	 for(int i=0;i<b.length;i++) c[i] = (char)(b[i]);
+	 return new String(c);
      }
 
 }
