@@ -13,6 +13,6 @@ java client.UDPClient <IP address> <port>
 ## Server (C++)
 ```
 cd server
-g++ -o server main.cpp udp_client_server.cpp
+g++ -o server main.cpp udp_client_server.cpp utils.cpp
 ./server
 ```
