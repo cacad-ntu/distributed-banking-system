@@ -8,6 +8,7 @@ import java.util.*;
 class HandleOpenAccount{
 
     public static byte[] createMessage(Scanner scanner)throws UnsupportedEncodingException{
+        System.out.println(Constants.SEPARATOR);
         System.out.println(Constants.OPEN_MSG);
 
         // Enter Name
@@ -57,6 +58,7 @@ class HandleOpenAccount{
     }
 
     public static boolean confirm(String name, String password, int currency, float balance, Scanner scanner){
+        System.out.println(Constants.SEPARATOR);
         System.out.println(Constants.CONFIRM_SUMMARY);
         System.out.println(Constants.SEPARATOR);
         System.out.printf(Constants.CONFIRM_NAME, name);
@@ -86,10 +88,12 @@ class HandleOpenAccount{
     }
 
     public static void handleResponse(byte[] response){
+        System.out.println(Constants.SEPARATOR);
         String statusStr = Utils.unmarshalString(response, 0, Constants.RESPONSE_TYPE_SIZE);
         int status = Integer.parseInt(statusStr);
         switch(status){
             case Constants.NAK:
+
                 String errMsg = Utils.unmarshalString(response, Constants.RESPONSE_TYPE_SIZE, response.length);
                 System.out.printf(Constants.ERR_MSG, errMsg);
                 break;
@@ -101,5 +105,6 @@ class HandleOpenAccount{
             default:
                 System.out.println(Constants.INVALID_RESPONSE);
         }
+        System.out.println(Constants.SEPARATOR);
     }
 }

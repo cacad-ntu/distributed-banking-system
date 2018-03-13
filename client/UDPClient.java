@@ -49,6 +49,7 @@ class UDPClient
             return;
         }
         try{
+            System.out.println(Constants.SEPARATOR);
             System.out.println(Constants.WELCOME_MSG);
             System.out.println(Constants.SEPARATOR);
 
