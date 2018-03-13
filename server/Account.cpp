@@ -14,12 +14,8 @@ int Account::getAccountNumber(){
 	return accountNumber;
 }
 
-string Account::getCurrency(){
-	switch(currency){
-	case 0: return "USD";
-	default: return "SGD";
-    }
-	return "SGD";
+int Account::getCurrency(){
+    return currency;
 }
 
 float Account::getBalance(){
@@ -32,4 +28,16 @@ string Account::getName(){
 
 string Account::getPassword(){
 	return passw;
+}
+
+void Account::addAmount(float amount){
+    balance += amount;
+}
+
+void Account::subtractAmount(float amount){
+    balance -= amount;
+}
+
+void Account::changePassword(string passw_){
+    passw = passw_;
 }

@@ -10,11 +10,16 @@ private:
 	string name, passw;
 public:
 	int getAccountNumber();
-	string getCurrency();
+	int getCurrency();
 	float getBalance();
 	string getName();
 	string getPassword();
 	Account();
 	Account(int accountNumber_, string name_, string passw_, int currency_, float balance_);
+
+    void addAmount(float amount);
+    void subtractAmount(float amount);
+
+    void changePassword(string passw_);
 };
 #endif
