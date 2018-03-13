@@ -12,10 +12,12 @@ char *buffer;
 int message_length;
 Handler handler;
 
+/*
 void send(udp_server &server){
     server.send(header,HEADER_SIZE);
     server.send(buffer,message_length);
 }
+*/
 
 void receive(udp_server &server){
     server.recv(header,HEADER_SIZE);
@@ -61,7 +63,6 @@ int main(int argc, char **argv){
     handler = Handler();
     while(true){
         receive(server);
-        send(server);
     }
     return 0;
 }

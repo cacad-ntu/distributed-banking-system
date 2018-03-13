@@ -30,12 +30,14 @@ string Account::getPassword(){
 	return passw;
 }
 
-void Account::addAmount(float amount){
+float Account::addAmount(float amount){
     balance += amount;
+    return balance;
 }
 
-void Account::subtractAmount(float amount){
+float Account::subtractAmount(float amount){
     balance -= amount;
+    return balance;
 }
 
 void Account::changePassword(string passw_){
