@@ -19,30 +19,25 @@ class UDPClient
 
     public void send(byte[] message) throws IOException, InterruptedException{
         // TODO: convert header packet as attribute
-        System.out.println("SENDING HEADER");
         byte[] header = Utils.marshal(message.length);
         DatagramPacket headerPacket = new DatagramPacket(header, header.length, this.IPAddress, this.port);
         this.clientSocket.send(headerPacket);
 
-        System.out.println("SENDING MESSAGE");
         DatagramPacket sendPacket = new DatagramPacket(message, message.length, this.IPAddress, this.port);
         this.clientSocket.send(sendPacket);
     }
 
     public byte[] receive() throws IOException{
         // TODO: convert header packet as attribute
-        System.out.println("RECEIVING HEADER");
         byte[] header = new byte[4];
         DatagramPacket headerPacket = new DatagramPacket(header, header.length);
         this.clientSocket.receive(headerPacket);
 
         int messageLength = Utils.unmarshalInteger(headerPacket.getData(), 0);
-        System.out.printf("Message length: %d\n", messageLength);
 
         byte[] receiveData = new byte[messageLength];
         DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
         this.clientSocket.receive(receivePacket);
-        System.out.println("RECEIVING MESSAGE");
 
         return receivePacket.getData();
     }

@@ -60,7 +60,7 @@ class Constants{
     public static final String OPEN_SELECT_CURRENCY_MSG = "Choose from the following currency: ";
     public static final String OPEN_CURRENCY_MSG = "Enter your default currency: ";
     public static final String OPEN_BALANCE_MSG = "Enter your starting balance (e.g. 1000.00): ";
-    public static final String SUCCESSFUL_OPEN_ACCOUNT = "Your account number: ";
+    public static final String SUCCESSFUL_OPEN_ACCOUNT = "Your account number: %d\n";
 
     // Confirmation UI Constant
     public static final String CONFIRM_SUMMARY = "Summary:";
