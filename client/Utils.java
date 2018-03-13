@@ -2,6 +2,8 @@ package client;
 
 import java.io.*;
 import java.nio.*;
+import java.lang.*;
+import java.util.*;
 
 class Utils{
     // Marshal and unmarshal String
@@ -11,9 +13,9 @@ class Utils{
         return ret;
     }
 
-    public static String unmarshalString(byte[] b){
-        char[] c = new char[b.length];
-        for(int i=0;i<b.length;i++) c[i] = (char)(b[i]);
+    public static String unmarshalString(byte[] b, int start, int end){
+        char[] c = new char[end - start];
+        for(int i = start; i < end; i++) c[i] = (char)(b[i]);
         return new String(c);
     }
 
@@ -28,18 +30,21 @@ class Utils{
         };
     }
 
-    public static int unmarshalInteger(byte[] b){
-        return b[0] << 24 | (b[1] & 0xFF) << 16 | (b[2] & 0xFF) << 8 | (b[3] & 0xFF);
+    public static int unmarshalInteger(byte[] b, int start){
+        return b[start] << 24 | (b[start+1] & 0xFF) << 16 | (b[start+2] & 0xFF) << 8 | (b[start+3] & 0xFF);
     }
 
 
     // Marshal and unmarshal float
-    public static byte[] marshal(float x){
-        return ByteBuffer.allocate(4).putFloat(x).array();
+    public static byte[] marshal(float f){
+        return ByteBuffer.allocate(Constants.FLOAT_SIZE).putFloat(f).array();
     }
 
-    public static float unmarshalFloat(byte[] b){
-        return ByteBuffer.wrap(b).order(ByteOrder.BIG_ENDIAN).getFloat();
+    public static float unmarshalFloat(byte[] b, int start){
+        byte[] content = new byte[]{
+            b[start], b[start+1], b[start+2], b[start+3]
+        };
+        return ByteBuffer.wrap(content).order(ByteOrder.BIG_ENDIAN).getFloat();
     }
 
 
@@ -56,5 +61,58 @@ class Utils{
 		for(int i=0;i<b.length;i++)
 			ret[i] = b[i].byteValue();
 		return ret;
-	}
+    }
+
+    public static byte[] byteUnboxing(List list){
+        return Utils.byteUnboxing((Byte[])list.toArray(new Byte[list.size()]));
+    }
+
+    // Append bytes to list
+    public static void appendMessage(List list, String s)throws UnsupportedEncodingException{
+        list.addAll(Arrays.asList(Utils.byteBoxing(Utils.marshal(
+            s.length()
+        ))));
+
+        list.addAll(Arrays.asList(Utils.byteBoxing(Utils.marshal(
+            s
+        ))));
+    }
+
+    public static void appendMessage(List list, int x)throws UnsupportedEncodingException{
+        list.addAll(Arrays.asList(Utils.byteBoxing(Utils.marshal(
+            Constants.INT_SIZE
+        ))));
+
+        list.addAll(Arrays.asList(Utils.byteBoxing(Utils.marshal(
+            x
+        ))));
+    }
+
+    public static void appendMessage(List list, float f)throws UnsupportedEncodingException{
+        list.addAll(Arrays.asList(Utils.byteBoxing(Utils.marshal(
+            Constants.FLOAT_SIZE
+        ))));
+
+        list.addAll(Arrays.asList(Utils.byteBoxing(Utils.marshal(
+            f
+        ))));
+    }
+
+    public static void appendMessage(List list, byte[] b)throws UnsupportedEncodingException{
+        list.addAll(Arrays.asList(Utils.byteBoxing(Utils.marshal(
+            b.length
+        ))));
+
+        list.addAll(Arrays.asList(Utils.byteBoxing(
+            b
+        )));
+    }
+
+    public static void appendType(List list, int serviceType)throws UnsupportedEncodingException{
+        list.addAll(Arrays.asList(Utils.byteBoxing(Utils.marshal(
+            serviceType
+        ))));
+    }
+
+
 }

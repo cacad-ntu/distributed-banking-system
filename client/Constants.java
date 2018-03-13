@@ -1,6 +1,16 @@
 package client;
 
 class Constants{
+    // Connection Constant
+    public static final int ACK = 1;
+    public static final int NAK = 0;
+    public static final int RESPONSE_TYPE_SIZE = 1;
+    public static final String INVALID_RESPONSE = "Sorry we are having problem in the server";
+
+    // Type Constant
+    public static final int INT_SIZE = 4;
+    public static final int FLOAT_SIZE = 4;
+
     // Service constant
     public static final int SERVICE_OPEN_ACCOUNT = 1;
     public static final int SERVICE_CLOSE_ACCOUNT = 2;
@@ -11,7 +21,21 @@ class Constants{
     public static final int SERVICE_CHANGE_PASSWORD = 7;
     public static final int SERVICE_EXIT = 8;
 
-    // UI Constant
+
+    // Currency Constant
+    public static final int CUR_SGD = 1;
+    public static final int CUR_USD = 2;
+
+    public static final String[] CURRENCY_STR = {
+        "0. not supported",
+        "1. SGD",
+        "2. USD"
+    };
+
+
+    // Main UI Constant
+    public static final String ERR_MSG = "Error: %s\n";
+    public static final String SUCCESS_MSG = "SUCCESS!";
     public static final String SEPARATOR = "================================================================================\n";
     public static final String WELCOME_MSG = "Welcome to CACAD banking system";
     public static final String EXIT_MSG = "Thank you for using CACAD banking system!";
@@ -28,4 +52,28 @@ class Constants{
     public static final String UNRECOGNIZE_SVC_MSG = "Sorry we cannot recognize your service choice!";
 
 
+
+    // Open Account UI Constant
+    public static final String OPEN_MSG = "Opening new account:";
+    public static final String OPEN_NAME_MSG = "Enter your name: ";
+    public static final String OPEN_PASSWORD_MSG = "Enter your password: ";
+    public static final String OPEN_SELECT_CURRENCY_MSG = "Choose from the following currency: ";
+    public static final String OPEN_CURRENCY_MSG = "Enter your default currency: ";
+    public static final String OPEN_BALANCE_MSG = "Enter your starting balance (e.g. 1000.00): ";
+    public static final String SUCCESSFUL_OPEN_ACCOUNT = "Your account number: ";
+
+    // Confirmation UI Constant
+    public static final String CONFIRM_SUMMARY = "Summary:";
+    public static final String CONFIRM_NAME = "Name: %s\n";
+    public static final String CONFIRM_PASSWORD = "Password: %s\n";
+    public static final String CONFIRM_CURRENCY = "Currency: %s\n";
+    public static final String CONFIRM_BALANCE = "Balance: %f\n";
+    public static final String CONFIRM_ACCOUNT_NUMBER = "Account Number: %d\n";
+    public static final String CONFIRM_MSG = "Are you sure? (Y/N) ";
+    public static final String CONFIRM_YES = "Y";
+    public static final String CONFIRM_NO = "N";
+
+    // Error UI Constant
+    public static final String ERR_NAME_INPUT = "Invalid name, must be non-empty string!";
+    public static final String ERR_PASSWORD_INPUT = "Invalid password, must be non-empty string!";
 }

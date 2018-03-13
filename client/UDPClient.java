@@ -17,57 +17,6 @@ class UDPClient
         this.port = port;
     }
 
-    public void handler1(List list, String message){
-        //type
-        list.add(Byte.valueOf((byte)((char)
-            1
-        )));
-
-        //value #bytes
-        list.addAll(Arrays.asList(Utils.byteBoxing(Utils.marshal(
-            4
-        ))));
-
-        //value
-        list.addAll(Arrays.asList(Utils.byteBoxing(Utils.marshal(
-            Float.parseFloat(message)
-        ))));
-    }
-
-    public void handler2(List list, String message){
-        //type
-        list.add(Byte.valueOf((byte)((char)
-            2
-        )));
-
-        //value #bytes
-        list.addAll(Arrays.asList(Utils.byteBoxing(Utils.marshal(
-            4
-        ))));
-
-        //value
-        list.addAll(Arrays.asList(Utils.byteBoxing(Utils.marshal(
-            Integer.parseInt(message)
-        ))));
-    }
-
-    public void handler3(List list, String message) throws UnsupportedEncodingException{
-        //type
-        list.add(Byte.valueOf((byte)((char)
-            3
-        )));
-
-        //value #bytes
-        list.addAll(Arrays.asList(Utils.byteBoxing(Utils.marshal(
-            message.length()
-        ))));
-
-        //value
-        list.addAll(Arrays.asList(Utils.byteBoxing(Utils.marshal(
-            message
-        ))));
-    }
-
     public void send(byte[] message) throws IOException, InterruptedException{
         // TODO: convert header packet as attribute
         byte[] header = Utils.marshal(message.length);
@@ -84,7 +33,7 @@ class UDPClient
         DatagramPacket headerPacket = new DatagramPacket(header, header.length);
         this.clientSocket.receive(headerPacket);
 
-        int messageLength = Utils.unmarshalInteger(headerPacket.getData());
+        int messageLength = Utils.unmarshalInteger(headerPacket.getData(), 0);
         System.out.printf("Message length: %d\n", messageLength);
 
         byte[] receiveData = new byte[messageLength];
@@ -92,26 +41,6 @@ class UDPClient
         this.clientSocket.receive(receivePacket);
 
         return receivePacket.getData();
-    }
-
-    public void handleResponse() throws IOException{
-        byte[] response = this.receive();
-
-        int type = (int)response[0];
-        int length = Utils.unmarshalInteger(new byte[]{response[1],response[2],response[3],response[4]});
-
-        byte[] value = new byte[length];
-        for(int i=0;i<length;i++) value[i] = response[i+5];
-
-        if(type == 1){
-            System.out.printf("Received float: %f\n",Utils.unmarshalFloat(value));
-        }
-        else if(type == 2){
-            System.out.printf("Received int: %d\n",Utils.unmarshalInteger(value));
-        }
-        else if(type == 3){
-            System.out.printf("Received string: %s\n",Utils.unmarshalString(value));
-        }
     }
 
     public static void main(String args[]){
@@ -126,7 +55,7 @@ class UDPClient
             UDPClient udpClient = new UDPClient(args[0],Integer.parseInt(args[1]));
             Scanner scanner = new Scanner(System.in);
 
-            Boolean exit = false;
+            boolean exit = false;
 
             while(!exit){
                 System.out.println(Constants.SELECTION_SVC_MSG);
@@ -147,7 +76,12 @@ class UDPClient
 
                 switch(serviceType){
                     case Constants.SERVICE_OPEN_ACCOUNT:
-                        System.out.printf("Doing service: %s\n", message);
+                        byte[] packageByte = HandleOpenAccount.createMessage(scanner);
+                        if (packageByte.length != 0){
+                            udpClient.send(packageByte);
+                            byte[] response = udpClient.receive();
+                            HandleOpenAccount.handleResponse(response);
+                        }
                         break;
                     case Constants.SERVICE_CLOSE_ACCOUNT:
                         System.out.printf("Doing service: %s\n", message);
@@ -180,6 +114,6 @@ class UDPClient
             }
         }
         catch(IOException e){}
-        // catch(InterruptedException e){}
+        catch(InterruptedException e){}
     }
 }
