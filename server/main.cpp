@@ -1,9 +1,8 @@
-#include "udp_client_server.h"
+#include "udp_server.h"
 #include "utils.h"
 #include "Handler.h"
 #include <iostream>
 using namespace std;
-using namespace udp_client_server;
 #define HEADER_SIZE 4
 
 int portno;
@@ -20,16 +19,18 @@ void send(udp_server &server){
 */
 
 void receive(udp_server &server){
-    server.recv(header,HEADER_SIZE);
+    cout << "WAITING\n";
+    server.receive(header,HEADER_SIZE);
     message_length = utils::unmarshalInt(header);
-
+    cout << "Msg length: " << message_length << '\n';
+    
     buffer = new char[message_length];
-    server.recv(buffer,message_length);
+    server.receive(buffer,message_length);
     
     char *cur = buffer;
-    int type = *cur;
-
-    cur++;
+    int type = utils::unmarshalInt(cur);
+    
+    cur+=4;
 
     switch(type){
     case 1:
@@ -59,7 +60,7 @@ void receive(udp_server &server){
 int main(int argc, char **argv){
     if (argc != 2) portno = 8080;
     else portno = atoi(argv[1]);
-    udp_server server("127.0.0.1",8080);
+    udp_server server(portno);
     handler = Handler();
     while(true){
         receive(server);
