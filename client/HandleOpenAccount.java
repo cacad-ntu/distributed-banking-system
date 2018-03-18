@@ -37,12 +37,13 @@ class HandleOpenAccount{
         for (int i = 1; i < Constants.CURRENCY_STR.length; i++){
             System.out.println(Constants.CURRENCY_STR[i]);
         }
+        System.out.print(Constants.CHOICE_SVC_MSG);
         String currencyStr = scanner.nextLine();
         int currency = Integer.parseInt(currencyStr);
 
         // Enter Starting Balance
         // TODO: Handle error
-        System.out.println(Constants.OPEN_BALANCE_MSG);
+        System.out.print(Constants.OPEN_BALANCE_MSG);
         String balanceStr = scanner.nextLine();
         float balance = Float.parseFloat(balanceStr);
 
@@ -93,7 +94,6 @@ class HandleOpenAccount{
         int status = Integer.parseInt(statusStr);
         switch(status){
             case Constants.NAK:
-
                 String errMsg = Utils.unmarshalString(response, Constants.RESPONSE_TYPE_SIZE, response.length);
                 System.out.printf(Constants.ERR_MSG, errMsg);
                 break;
@@ -105,6 +105,7 @@ class HandleOpenAccount{
             default:
                 System.out.println(Constants.INVALID_RESPONSE);
         }
+        System.out.println();
         System.out.println(Constants.SEPARATOR);
     }
 }
