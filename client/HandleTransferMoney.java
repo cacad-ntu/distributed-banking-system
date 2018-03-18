@@ -124,10 +124,14 @@ class HandleTransferMoney{
                 System.out.printf(Constants.ERR_MSG, errMsg);
                 break;
             case Constants.ACK:
-                // TODO: response should contain currency
-                float newBalance = Utils.unmarshalMsgFloat(response, Constants.RESPONSE_TYPE_SIZE);
+                int ptr = Constants.RESPONSE_TYPE_SIZE;
+                int currency = Utils.unmarshalMsgInteger(response, ptr);
+
+                ptr += Constants.INT_SIZE + Constants.INT_SIZE;
+                float newBalance = Utils.unmarshalMsgFloat(response, ptr);
+
                 System.out.println(Constants.SUCCESS_MSG);
-                System.out.printf(Constants.SUCCESSFUL_TRANSFER_MONEY, 0, newBalance);
+                System.out.printf(Constants.SUCCESSFUL_DEPOSIT_MONEY, currency, newBalance);
                 break;
             default:
                 System.out.println(Constants.INVALID_RESPONSE);
