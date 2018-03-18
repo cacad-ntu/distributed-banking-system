@@ -9,13 +9,17 @@ class Utils{
     // Marshal and unmarshal String
     public static byte[] marshal(String s) throws UnsupportedEncodingException{
         byte[] ret = new byte[s.length()];
-        for(int i=0;i<s.length();i++) ret[i] = (byte)s.charAt(i);
+        for(int i=0;i<s.length();i++) {
+            ret[i] = (byte)s.charAt(i);
+        }
         return ret;
     }
 
     public static String unmarshalString(byte[] b, int start, int end){
         char[] c = new char[end - start];
-        for(int i = start; i < end; i++) c[i] = (char)(b[i]);
+        for(int i = start; i < end; i++) {
+            c[i-start] = (char)(b[i]);
+        }
         return new String(c);
     }
 
