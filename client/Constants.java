@@ -69,6 +69,14 @@ class Constants{
     public static final String CLOSE_PASSWORD_MSG = "Enter your password: ";
     public static final String SUCCESSFUL_CLOSE_ACCOUNT = "You have successfully close your account.";
 
+    // Change Password UI Constant
+    public static final String CHANGE_MSG = "Change Password!";
+    public static final String CHANGE_NAME_MSG = "Enter your name: ";
+    public static final String CHANGE_ACC_NUM_MSG = "Enter your account number: ";
+    public static final String CHANGE_PASSWORD_MSG = "Enter your old password: ";
+    public static final String CHANGE_NEW_PASSWORD_MSG = "Enter your new password: ";
+    public static final String SUCCESSFUL_CHANGE_PASSWORD = "You have successfully change your password.";
+
     // Deposit Money UI Constant
     public static final String DEPOSIT_MSG = "Deposit money!";
     public static final String DEPOSIT_NAME_MSG = "Enter your name: ";
@@ -106,6 +114,7 @@ class Constants{
     public static final String CONFIRM_NAME = "Name: %s\n";
     public static final String CONFIRM_REC_NAME = "Name: %s\n";
     public static final String CONFIRM_PASSWORD = "Password: %s\n";
+    public static final String CONFIRM_NEW_PASSWORD = "New Password: %s\n";
     public static final String CONFIRM_CURRENCY = "Currency: %s\n";
     public static final String CONFIRM_BALANCE = "Balance: %f\n";
     public static final String CONFIRM_ACCOUNT_NUMBER = "Account Number: %d\n";
