@@ -69,6 +69,14 @@ class Constants{
     public static final String CLOSE_PASSWORD_MSG = "Enter your password: ";
     public static final String SUCCESSFUL_CLOSE_ACCOUNT = "You have successfully close your account.";
 
+    // Change Password UI Constant
+    public static final String CHANGE_MSG = "Change Password!";
+    public static final String CHANGE_NAME_MSG = "Enter your name: ";
+    public static final String CHANGE_ACC_NUM_MSG = "Enter your account number: ";
+    public static final String CHANGE_PASSWORD_MSG = "Enter your old password: ";
+    public static final String CHANGE_NEW_PASSWORD_MSG = "Enter your new password: ";
+    public static final String SUCCESSFUL_CHANGE_PASSWORD = "You have successfully change your password.";
+
     // Deposit Money UI Constant
     public static final String DEPOSIT_MSG = "Deposit money!";
     public static final String DEPOSIT_NAME_MSG = "Enter your name: ";
@@ -77,7 +85,7 @@ class Constants{
     public static final String DEPOSIT_SELECT_CURRENCY_MSG = "Choose from the following currency: ";
     public static final String DEPOSIT_CURRENCY_MSG = "Enter currency: ";
     public static final String DEPOSIT_BALANCE_MSG = "Enter deposit balance (e.g. 1000.00): ";
-    public static final String SUCCESSFUL_DEPOSIT_ACCOUNT = "You have successfully deposited money.\n Your new balance: %s %f\n";
+    public static final String SUCCESSFUL_DEPOSIT_MONEY = "You have successfully deposited money.\n Your new balance: %s %f\n";
 
     // Withdraw Money UI Constant
     public static final String WITHDRAW_MSG = "Withdraw money!";
@@ -87,7 +95,7 @@ class Constants{
     public static final String WITHDRAW_SELECT_CURRENCY_MSG = "Choose from the following currency: ";
     public static final String WITHDRAW_CURRENCY_MSG = "Enter currency: ";
     public static final String WITHDRAW_BALANCE_MSG = "Enter withdraw balance (e.g. 1000.00): ";
-    public static final String SUCCESSFUL_WITHDRAW_ACCOUNT = "You have successfully withdrawn money.\n Your new balance: %s %f\n";
+    public static final String SUCCESSFUL_WITHDRAW_MONEY = "You have successfully withdrawn money.\n Your new balance: %s %f\n";
 
     // Transfer Money UI Constant
     public static final String TRANSFER_MSG = "Transfer money!";
@@ -99,13 +107,14 @@ class Constants{
     public static final String TRANSFER_SELECT_CURRENCY_MSG = "Choose from the following currency: ";
     public static final String TRANSFER_CURRENCY_MSG = "Enter currency: ";
     public static final String TRANSFER_BALANCE_MSG = "Enter transfer balance (e.g. 1000.00): ";
-    public static final String SUCCESSFUL_TRANSFER_ACCOUNT = "You have successfully transferred money.\n Your new balance: %s %f\n";
+    public static final String SUCCESSFUL_TRANSFER_MONEY = "You have successfully transferred money.\n Your new balance: %s %f\n";
 
     // Confirmation UI Constant
     public static final String CONFIRM_SUMMARY = "Summary:";
     public static final String CONFIRM_NAME = "Name: %s\n";
     public static final String CONFIRM_REC_NAME = "Name: %s\n";
     public static final String CONFIRM_PASSWORD = "Password: %s\n";
+    public static final String CONFIRM_NEW_PASSWORD = "New Password: %s\n";
     public static final String CONFIRM_CURRENCY = "Currency: %s\n";
     public static final String CONFIRM_BALANCE = "Balance: %f\n";
     public static final String CONFIRM_ACCOUNT_NUMBER = "Account Number: %d\n";

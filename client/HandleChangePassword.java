@@ -4,73 +4,65 @@ import java.io.*;
 import java.lang.*;
 import java.util.*;
 
-class HandleWithdrawMoney{
+class HandleChangePassword{
     public static byte[] createMessage(Scanner scanner)throws UnsupportedEncodingException{
         System.out.println(Constants.SEPARATOR);
-        System.out.println(Constants.WITHDRAW_MSG);
+        System.out.println(Constants.CHANGE_MSG);
 
         // Enter Name
-        System.out.print(Constants.WITHDRAW_NAME_MSG);
+        System.out.print(Constants.CHANGE_NAME_MSG);
         String name = scanner.nextLine();
         while(name.length() == 0){
             System.out.println(Constants.ERR_NAME_INPUT);
             System.out.println();
-            System.out.print(Constants.WITHDRAW_NAME_MSG);
+            System.out.print(Constants.CHANGE_NAME_MSG);
             name = scanner.nextLine();
         }
 
         // Enter Account Number
         // TODO: Handle error
-        System.out.print(Constants.WITHDRAW_ACC_NUM_MSG);
+        System.out.print(Constants.CHANGE_ACC_NUM_MSG);
         String accNumStr = scanner.nextLine();
         int accNum = Integer.parseInt(accNumStr);
 
         // Enter Password
-        System.out.print(Constants.WITHDRAW_PASSWORD_MSG);
+        System.out.print(Constants.CHANGE_PASSWORD_MSG);
         String password = scanner.nextLine();
         while(password.length() == 0){
             System.out.println(Constants.ERR_PASSWORD_INPUT);
             System.out.println();
-            System.out.print(Constants.WITHDRAW_PASSWORD_MSG);
+            System.out.print(Constants.CHANGE_PASSWORD_MSG);
             password = scanner.nextLine();
         }
 
-        // Enter Currency
-        // TODO: Handle error
-        System.out.println(Constants.WITHDRAW_SELECT_CURRENCY_MSG);
-        for (int i = 1; i < Constants.CURRENCY_STR.length; i++){
-            System.out.printf("%d. %s\n", i, Constants.CURRENCY_STR[i]);
+        // Enter Password
+        System.out.print(Constants.CHANGE_NEW_PASSWORD_MSG);
+        String newPassword = scanner.nextLine();
+        while(newPassword.length() == 0){
+            System.out.println(Constants.ERR_PASSWORD_INPUT);
+            System.out.println();
+            System.out.print(Constants.CHANGE_NEW_PASSWORD_MSG);
+            newPassword = scanner.nextLine();
         }
-        System.out.print(Constants.WITHDRAW_CURRENCY_MSG);
-        String currencyStr = scanner.nextLine();
-        int currency = Integer.parseInt(currencyStr);
-
-        // Enter Withdraw Balance
-        // TODO: Handle error
-        System.out.print(Constants.WITHDRAW_BALANCE_MSG);
-        String balanceStr = scanner.nextLine();
-        float balance = Float.parseFloat(balanceStr);
 
         System.out.println();
-        boolean confirm = HandleWithdrawMoney.confirm(name, accNum, password, currency, balance, scanner);
+        boolean confirm = HandleChangePassword.confirm(name, accNum, password, newPassword, scanner);
         System.out.println();
 
         if (confirm){
-            return HandleWithdrawMoney.constructMessage(name, accNum, password, currency, balance);
+            return HandleChangePassword.constructMessage(name, accNum, password, newPassword);
         }
-
         return new byte[0];
     }
 
-    public static boolean confirm(String name, int accountNumber, String password, int currency, float balance, Scanner scanner){
+    public static boolean confirm(String name, int accountNumber, String password, String newPassword, Scanner scanner){
         System.out.print(Constants.SEPARATOR);
         System.out.println(Constants.CONFIRM_SUMMARY);
         System.out.println(Constants.SEPARATOR);
         System.out.printf(Constants.CONFIRM_NAME, name);
         System.out.printf(Constants.CONFIRM_ACCOUNT_NUMBER, accountNumber);
         System.out.printf(Constants.CONFIRM_PASSWORD, password);
-        System.out.printf(Constants.CONFIRM_CURRENCY, Constants.CURRENCY_STR[currency]);
-        System.out.printf(Constants.CONFIRM_BALANCE, balance);
+        System.out.printf(Constants.CONFIRM_NEW_PASSWORD, newPassword);
         System.out.print(Constants.CONFIRM_MSG);
         String confirm = scanner.nextLine();
 
@@ -81,15 +73,14 @@ class HandleWithdrawMoney{
         }
     }
 
-    public static byte[] constructMessage(String name, int accountNumber, String password, int currency, float balance)throws UnsupportedEncodingException{
+    public static byte[] constructMessage(String name, int accountNumber, String password, String newPassword)throws UnsupportedEncodingException{
         List message = new ArrayList();
 
-        Utils.appendType(message, Constants.SERVICE_WITHDRAW_MONEY);
+        Utils.appendType(message, Constants.SERVICE_CHANGE_PASSWORD);
         Utils.appendMessage(message, name);
         Utils.appendMessage(message, accountNumber);
         Utils.appendMessage(message, password);
-        Utils.appendMessage(message, currency);
-        Utils.appendMessage(message, balance);
+        Utils.appendMessage(message, newPassword);
 
         return Utils.byteUnboxing(message);
     }
@@ -104,10 +95,7 @@ class HandleWithdrawMoney{
                 System.out.printf(Constants.ERR_MSG, errMsg);
                 break;
             case Constants.ACK:
-                // TODO: response should contain currency
-                float newBalance = Utils.unmarshalMsgFloat(response, Constants.RESPONSE_TYPE_SIZE);
-                System.out.println(Constants.SUCCESS_MSG);
-                System.out.printf(Constants.SUCCESSFUL_WITHDRAW_MONEY, 0, newBalance);
+                System.out.println(Constants.SUCCESSFUL_CHANGE_PASSWORD);
                 break;
             default:
                 System.out.println(Constants.INVALID_RESPONSE);

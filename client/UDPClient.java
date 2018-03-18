@@ -120,7 +120,12 @@ class UDPClient
                         }
                         break;
                     case Constants.SERVICE_CHANGE_PASSWORD:
-                        System.out.printf("Service %s, comming soon\n", message);
+                        packageByte = HandleChangePassword.createMessage(scanner);
+                        if (packageByte.length != 0){
+                            udpClient.send(packageByte);
+                            byte[] response = udpClient.receive();
+                            HandleChangePassword.handleResponse(response);
+                        }
                         break;
                     case Constants.SERVICE_EXIT:
                         System.out.println(Constants.EXIT_MSG);
