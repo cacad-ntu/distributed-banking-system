@@ -37,7 +37,7 @@ class HandleOpenAccount{
         for (int i = 1; i < Constants.CURRENCY_STR.length; i++){
             System.out.println(Constants.CURRENCY_STR[i]);
         }
-        System.out.print(Constants.CHOICE_SVC_MSG);
+        System.out.print(Constants.OPEN_CURRENCY_MSG);
         String currencyStr = scanner.nextLine();
         int currency = Integer.parseInt(currencyStr);
 
