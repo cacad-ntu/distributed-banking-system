@@ -4,13 +4,13 @@
 #include<unordered_map>
 #include<utility>
 #include "Account.h"
-#include "SmartPtr.h"
+//#include "SmartPtr.h"
 using namespace std;
 
 class AccountManager{
 private:
 	int newID;
-	unordered_map<int,SmartPtr<Account>> accounts;
+	unordered_map<int,Account*> accounts;
 public:
 	int createAccount(string name, string passw, int currency, float balance);
 	bool deleteAccount(int accountNumber, string name, string passw);

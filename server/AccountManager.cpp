@@ -7,8 +7,7 @@ AccountManager::AccountManager(){
 
 int AccountManager::createAccount(string name, string passw, int currency, float balance){
     int accountNumber = newID++;
-	SmartPtr<Account> ptr(new Account(accountNumber,name,passw,currency,balance));
-	accounts[accountNumber] = ptr;
+	accounts[accountNumber] = new Account(accountNumber,name,passw,currency,balance);
 	return accountNumber;
 }
 
