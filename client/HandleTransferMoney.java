@@ -39,7 +39,7 @@ class HandleTransferMoney{
         // TODO: Handle error
         System.out.print(Constants.TRANSFER_REC_ACC_NUM_MSG);
         String recAccNumStr = scanner.nextLine();
-        int recAccNum = Integer.parseInt(accNumStr);
+        int recAccNum = Integer.parseInt(recAccNumStr);
 
         // Enter Password
         System.out.print(Constants.TRANSFER_PASSWORD_MSG);
