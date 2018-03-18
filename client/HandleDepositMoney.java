@@ -4,7 +4,7 @@ import java.io.*;
 import java.lang.*;
 import java.util.*;
 
-class HandleDepositMonet{
+class HandleDepositMoney{
     public static byte[] createMessage(Scanner scanner)throws UnsupportedEncodingException{
         System.out.println(Constants.SEPARATOR);
         System.out.println(Constants.DEPOSIT_MSG);
@@ -52,11 +52,11 @@ class HandleDepositMonet{
         float balance = Float.parseFloat(balanceStr);
 
         System.out.println();
-        boolean confirm = HandleDepositAccount.confirm(name, accNum, password, currency, balance, scanner);
+        boolean confirm = HandleDepositMoney.confirm(name, accNum, password, currency, balance, scanner);
         System.out.println();
 
         if (confirm){
-            return HandleDepositAccount.constructMessage(name, accNum, password, currency, balance);
+            return HandleDepositMoney.constructMessage(name, accNum, password, currency, balance);
         }
 
         return new byte[0];
@@ -107,7 +107,7 @@ class HandleDepositMonet{
                 // TODO: response should contain currency
                 float newBalance = Utils.unmarshalFloat(response, Constants.RESPONSE_TYPE_SIZE);
                 System.out.println(Constants.SUCCESS_MSG);
-                System.out.printf(Constants.SUCCESSFUL_DEPOSIT_ACCOUNT, 0, accountNumber);
+                System.out.printf(Constants.SUCCESSFUL_DEPOSIT_ACCOUNT, 0, newBalance);
                 break;
             default:
                 System.out.println(Constants.INVALID_RESPONSE);
