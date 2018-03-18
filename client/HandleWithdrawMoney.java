@@ -107,7 +107,7 @@ class HandleWithdrawMoney{
                 // TODO: response should contain currency
                 float newBalance = Utils.unmarshalMsgFloat(response, Constants.RESPONSE_TYPE_SIZE);
                 System.out.println(Constants.SUCCESS_MSG);
-                System.out.printf(Constants.SUCCESSFUL_WITHDRAW_ACCOUNT, 0, newBalance);
+                System.out.printf(Constants.SUCCESSFUL_WITHDRAW_MONEY, 0, newBalance);
                 break;
             default:
                 System.out.println(Constants.INVALID_RESPONSE);

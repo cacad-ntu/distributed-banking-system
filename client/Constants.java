@@ -77,7 +77,7 @@ class Constants{
     public static final String DEPOSIT_SELECT_CURRENCY_MSG = "Choose from the following currency: ";
     public static final String DEPOSIT_CURRENCY_MSG = "Enter currency: ";
     public static final String DEPOSIT_BALANCE_MSG = "Enter deposit balance (e.g. 1000.00): ";
-    public static final String SUCCESSFUL_DEPOSIT_ACCOUNT = "You have successfully deposited money.\n Your new balance: %s %f\n";
+    public static final String SUCCESSFUL_DEPOSIT_MONEY = "You have successfully deposited money.\n Your new balance: %s %f\n";
 
     // Withdraw Money UI Constant
     public static final String WITHDRAW_MSG = "Withdraw money!";
@@ -87,7 +87,7 @@ class Constants{
     public static final String WITHDRAW_SELECT_CURRENCY_MSG = "Choose from the following currency: ";
     public static final String WITHDRAW_CURRENCY_MSG = "Enter currency: ";
     public static final String WITHDRAW_BALANCE_MSG = "Enter withdraw balance (e.g. 1000.00): ";
-    public static final String SUCCESSFUL_WITHDRAW_ACCOUNT = "You have successfully withdrawn money.\n Your new balance: %s %f\n";
+    public static final String SUCCESSFUL_WITHDRAW_MONEY = "You have successfully withdrawn money.\n Your new balance: %s %f\n";
 
     // Transfer Money UI Constant
     public static final String TRANSFER_MSG = "Transfer money!";
@@ -99,7 +99,7 @@ class Constants{
     public static final String TRANSFER_SELECT_CURRENCY_MSG = "Choose from the following currency: ";
     public static final String TRANSFER_CURRENCY_MSG = "Enter currency: ";
     public static final String TRANSFER_BALANCE_MSG = "Enter transfer balance (e.g. 1000.00): ";
-    public static final String SUCCESSFUL_TRANSFER_ACCOUNT = "You have successfully transferred money.\n Your new balance: %s %f\n";
+    public static final String SUCCESSFUL_TRANSFER_MONEY = "You have successfully transferred money.\n Your new balance: %s %f\n";
 
     // Confirmation UI Constant
     public static final String CONFIRM_SUMMARY = "Summary:";
