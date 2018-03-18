@@ -35,7 +35,7 @@ class HandleWithdrawMoney{
             password = scanner.nextLine();
         }
 
-        // Enter Default Currency
+        // Enter Currency
         // TODO: Handle error
         System.out.println(Constants.WITHDRAW_SELECT_CURRENCY_MSG);
         for (int i = 1; i < Constants.CURRENCY_STR.length; i++){
@@ -45,7 +45,7 @@ class HandleWithdrawMoney{
         String currencyStr = scanner.nextLine();
         int currency = Integer.parseInt(currencyStr);
 
-        // Enter Starting Balance
+        // Enter Withdraw Balance
         // TODO: Handle error
         System.out.print(Constants.WITHDRAW_BALANCE_MSG);
         String balanceStr = scanner.nextLine();

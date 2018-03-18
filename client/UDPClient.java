@@ -93,16 +93,31 @@ class UDPClient
                         }
                         break;
                     case Constants.SERVICE_DEPOSIT_MONEY:
-                        System.out.printf("Service %s, comming soon\n", message);
+                        packageByte = HandleDepositMoney.createMessage(scanner);
+                        if (packageByte.length != 0){
+                            udpClient.send(packageByte);
+                            byte[] response = udpClient.receive();
+                            HandleDepositMoney.handleResponse(response);
+                        }
                         break;
                     case Constants.SERVICE_WITHDRAW_MONEY:
-                        System.out.printf("Service %s, comming soon\n", message);
+                        packageByte = HandleWithdrawMoney.createMessage(scanner);
+                        if (packageByte.length != 0){
+                            udpClient.send(packageByte);
+                            byte[] response = udpClient.receive();
+                            HandleWithdrawMoney.handleResponse(response);
+                        }
                         break;
                     case Constants.SERVICE_MONITOR_UPDATE:
                         System.out.printf("Service %s, comming soon\n", message);
                         break;
                     case Constants.SERVICE_TRANSFER_MONEY:
-                        System.out.printf("Service %s, comming soon\n", message);
+                        packageByte = HandleTransferMoney.createMessage(scanner);
+                        if (packageByte.length != 0){
+                            udpClient.send(packageByte);
+                            byte[] response = udpClient.receive();
+                            HandleTransferMoney.handleResponse(response);
+                        }
                         break;
                     case Constants.SERVICE_CHANGE_PASSWORD:
                         System.out.printf("Service %s, comming soon\n", message);
