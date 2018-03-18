@@ -79,6 +79,16 @@ class Constants{
     public static final String DEPOSIT_BALANCE_MSG = "Enter your deposit balance (e.g. 1000.00): ";
     public static final String SUCCESSFUL_DEPOSIT_ACCOUNT = "You have successfully deposit money.\n Your new balance: %s %f\n";
 
+    // Withdraw Money UI Constant
+    public static final String WITHDRAW_MSG = "Withdraw money!";
+    public static final String WITHDRAW_NAME_MSG = "Enter your name: ";
+    public static final String WITHDRAW_ACC_NUM_MSG = "Enter your account number: ";
+    public static final String WITHDRAW_PASSWORD_MSG = "Enter your password: ";
+    public static final String WITHDRAW_SELECT_CURRENCY_MSG = "Choose from the following currency: ";
+    public static final String WITHDRAW_CURRENCY_MSG = "Enter your currency: ";
+    public static final String WITHDRAW_BALANCE_MSG = "Enter your withdraw balance (e.g. 1000.00): ";
+    public static final String SUCCESSFUL_WITHDRAW_ACCOUNT = "You have successfully withdraw money.\n Your new balance: %s %f\n";
+
     // Confirmation UI Constant
     public static final String CONFIRM_SUMMARY = "Summary:";
     public static final String CONFIRM_NAME = "Name: %s\n";
