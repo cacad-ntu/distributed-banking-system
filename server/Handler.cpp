@@ -68,12 +68,12 @@ void Handler::service2(udp_server &server, char *p){
     bool success = acManager.deleteAccount(accountNum,name,passw);
 
     char header[HEADER_SIZE];
-    char response[1];
-
-    //utils::marshalInt(1,header);
-    char *cur = response;
+   
     
     if(success){
+        char response[1];
+        char *cur = response;
+        cout << "Success deleting account\n";
         utils::marshalInt(1,header);
         utils::marshalString(ACK_SUCCESS,cur);
 
@@ -81,7 +81,13 @@ void Handler::service2(udp_server &server, char *p){
         server.send(response,1);
     }
     else{
+        
+        cout << "Unsuccessful deletion\n";
         string err = "Wrong account number, name, or password!";
+
+        char *response = new char[1+4+(int)err.size()];
+        char *cur = response;
+        
         utils::marshalInt(1+4+(int)err.size(),header);
 
         utils::marshalString(ACK_FAIL,cur);
@@ -92,8 +98,15 @@ void Handler::service2(udp_server &server, char *p){
 
         utils::marshalString(err,cur);
 
+        cout << "sending\n";
+
         server.send(header,HEADER_SIZE);
+
+        cout << "header sent\n";
+        
         server.send(response,1+4+(int)err.size());
+
+        cout << "response sent\n";
     }
 }
 
