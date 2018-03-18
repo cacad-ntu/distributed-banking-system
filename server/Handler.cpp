@@ -32,16 +32,18 @@ void Handler::service1(udp_server &server, char *p){
     int accountNum = acManager.createAccount(name,passw,currency,balance);
 
     char header[HEADER_SIZE];
-    char response[5];
+    char response[9];
 
-    utils::marshalInt(5,header);
+    utils::marshalInt(9,header);
     char *cur = response;
     utils::marshalString(ACK,cur);
     cur += 1;
+    utils::marshalInt(4,cur);
+    cur += 4;
     utils::marshalInt(accountNum,cur);
     
     server.send(header,HEADER_SIZE);
-    server.send(response,5);
+    server.send(response,9);
 }
 
 void Handler::service2(udp_server &server, char *p){
@@ -155,19 +157,26 @@ void Handler::service3(udp_server &server, char *p){
         server.send(response,1+4+(int)err.size());
     }
     else{
-        char response[9];
+        char response[17];
         char *cur = response;
 
         utils::marshalString(ACK_SUCCESS,cur);
         cur += 1;
 
+        utils::marshalInt(4,cur);
+        cur += 4;
+
         utils::marshalInt(balance.first,cur);
+        cur += 4;
+
+        utils::marshalInt(4,cur);
         cur += 4;
         
         utils::marshalFloat(balance.second,cur);
-    
+
+        utils::marshalInt(17,header);
         server.send(header,HEADER_SIZE);
-        server.send(response,9);
+        server.send(response,17);
     }
 }
 
@@ -232,19 +241,26 @@ void Handler::service4(udp_server &server, char *p){
         server.send(response,1+4+(int)err.size());
     }
     else{
-        char response[9];
+        char response[17];
         char *cur = response;
 
         utils::marshalString(ACK_SUCCESS,cur);
         cur += 1;
 
+        utils::marshalInt(4,cur);
+        cur += 4;
+
         utils::marshalInt(balance.first,cur);
+        cur += 4;
+
+        utils::marshalInt(4,cur);
         cur += 4;
         
         utils::marshalFloat(balance.second,cur);
-    
+
+        utils::marshalInt(17,header);
         server.send(header,HEADER_SIZE);
-        server.send(response,9);
+        server.send(response,17);
     }
 }
 
@@ -338,19 +354,27 @@ void Handler::service6(udp_server &server, char *p){
         server.send(response,1+4+(int)err.size());
     }
     else{
-        char response[9];
+        char response[17];
         char *cur = response;
 
         utils::marshalString(ACK_SUCCESS,cur);
         cur += 1;
 
+        utils::marshalInt(4,cur);
+        cur += 4;
+
         utils::marshalInt(balance.first,cur);
+        cur += 4;
+
+        utils::marshalInt(4,cur);
         cur += 4;
         
         utils::marshalFloat(balance.second,cur);
+
+        utils::marshalInt(17,header);
     
         server.send(header,HEADER_SIZE);
-        server.send(response,9);
+        server.send(response,17);
     }
 }
 
