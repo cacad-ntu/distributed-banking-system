@@ -58,8 +58,8 @@ class Constants{
     public static final String OPEN_NAME_MSG = "Enter your name: ";
     public static final String OPEN_PASSWORD_MSG = "Enter your password: ";
     public static final String OPEN_SELECT_CURRENCY_MSG = "Choose from the following currency: ";
-    public static final String OPEN_CURRENCY_MSG = "Enter your default currency: ";
-    public static final String OPEN_BALANCE_MSG = "Enter your starting balance (e.g. 1000.00): ";
+    public static final String OPEN_CURRENCY_MSG = "Enter default currency: ";
+    public static final String OPEN_BALANCE_MSG = "Enter starting balance (e.g. 1000.00): ";
     public static final String SUCCESSFUL_OPEN_ACCOUNT = "You have successfully open new account.\n Your account number: %d\n";
 
     // Close Account UI Constant
@@ -75,9 +75,9 @@ class Constants{
     public static final String DEPOSIT_ACC_NUM_MSG = "Enter your account number: ";
     public static final String DEPOSIT_PASSWORD_MSG = "Enter your password: ";
     public static final String DEPOSIT_SELECT_CURRENCY_MSG = "Choose from the following currency: ";
-    public static final String DEPOSIT_CURRENCY_MSG = "Enter your currency: ";
-    public static final String DEPOSIT_BALANCE_MSG = "Enter your deposit balance (e.g. 1000.00): ";
-    public static final String SUCCESSFUL_DEPOSIT_ACCOUNT = "You have successfully deposit money.\n Your new balance: %s %f\n";
+    public static final String DEPOSIT_CURRENCY_MSG = "Enter currency: ";
+    public static final String DEPOSIT_BALANCE_MSG = "Enter deposit balance (e.g. 1000.00): ";
+    public static final String SUCCESSFUL_DEPOSIT_ACCOUNT = "You have successfully deposited money.\n Your new balance: %s %f\n";
 
     // Withdraw Money UI Constant
     public static final String WITHDRAW_MSG = "Withdraw money!";
@@ -85,17 +85,31 @@ class Constants{
     public static final String WITHDRAW_ACC_NUM_MSG = "Enter your account number: ";
     public static final String WITHDRAW_PASSWORD_MSG = "Enter your password: ";
     public static final String WITHDRAW_SELECT_CURRENCY_MSG = "Choose from the following currency: ";
-    public static final String WITHDRAW_CURRENCY_MSG = "Enter your currency: ";
-    public static final String WITHDRAW_BALANCE_MSG = "Enter your withdraw balance (e.g. 1000.00): ";
-    public static final String SUCCESSFUL_WITHDRAW_ACCOUNT = "You have successfully withdraw money.\n Your new balance: %s %f\n";
+    public static final String WITHDRAW_CURRENCY_MSG = "Enter currency: ";
+    public static final String WITHDRAW_BALANCE_MSG = "Enter withdraw balance (e.g. 1000.00): ";
+    public static final String SUCCESSFUL_WITHDRAW_ACCOUNT = "You have successfully withdrawn money.\n Your new balance: %s %f\n";
+
+    // Transfer Money UI Constant
+    public static final String TRANSFER_MSG = "Transfer money!";
+    public static final String TRANSFER_NAME_MSG = "Enter your name: ";
+    public static final String TRANSFER_ACC_NUM_MSG = "Enter your account number: ";
+    public static final String TRANSFER_REC_NAME_MSG = "Enter recipient name: ";
+    public static final String TRANSFER_REC_ACC_NUM_MSG = "Enter recipient account number: ";
+    public static final String TRANSFER_PASSWORD_MSG = "Enter your password: ";
+    public static final String TRANSFER_SELECT_CURRENCY_MSG = "Choose from the following currency: ";
+    public static final String TRANSFER_CURRENCY_MSG = "Enter currency: ";
+    public static final String TRANSFER_BALANCE_MSG = "Enter transfer balance (e.g. 1000.00): ";
+    public static final String SUCCESSFUL_TRANSFER_ACCOUNT = "You have successfully transferred money.\n Your new balance: %s %f\n";
 
     // Confirmation UI Constant
     public static final String CONFIRM_SUMMARY = "Summary:";
     public static final String CONFIRM_NAME = "Name: %s\n";
+    public static final String CONFIRM_REC_NAME = "Name: %s\n";
     public static final String CONFIRM_PASSWORD = "Password: %s\n";
     public static final String CONFIRM_CURRENCY = "Currency: %s\n";
     public static final String CONFIRM_BALANCE = "Balance: %f\n";
     public static final String CONFIRM_ACCOUNT_NUMBER = "Account Number: %d\n";
+    public static final String CONFIRM_REC_ACCOUNT_NUMBER = "Recipient Account Number: %d\n";
     public static final String CONFIRM_MSG = "Are you sure? (Y/N) ";
     public static final String CONFIRM_YES = "Y";
     public static final String CONFIRM_NO = "N";
