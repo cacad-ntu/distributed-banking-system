@@ -35,7 +35,7 @@ class HandleOpenAccount{
         // TODO: Handle error
         System.out.println(Constants.OPEN_SELECT_CURRENCY_MSG);
         for (int i = 1; i < Constants.CURRENCY_STR.length; i++){
-            System.out.println(Constants.CURRENCY_STR[i]);
+            System.out.printf("%d. %s\n", i, Constants.CURRENCY_STR[i]);
         }
         System.out.print(Constants.OPEN_CURRENCY_MSG);
         String currencyStr = scanner.nextLine();
@@ -59,7 +59,7 @@ class HandleOpenAccount{
     }
 
     public static boolean confirm(String name, String password, int currency, float balance, Scanner scanner){
-        System.out.println(Constants.SEPARATOR);
+        System.out.print(Constants.SEPARATOR);
         System.out.println(Constants.CONFIRM_SUMMARY);
         System.out.println(Constants.SEPARATOR);
         System.out.printf(Constants.CONFIRM_NAME, name);

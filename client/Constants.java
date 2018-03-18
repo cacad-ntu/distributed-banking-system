@@ -27,9 +27,9 @@ class Constants{
     public static final int CUR_USD = 2;
 
     public static final String[] CURRENCY_STR = {
-        "0. not supported",
-        "1. SGD",
-        "2. USD"
+        "not supported",
+        "SGD",
+        "USD"
     };
 
 
@@ -60,14 +60,24 @@ class Constants{
     public static final String OPEN_SELECT_CURRENCY_MSG = "Choose from the following currency: ";
     public static final String OPEN_CURRENCY_MSG = "Enter your default currency: ";
     public static final String OPEN_BALANCE_MSG = "Enter your starting balance (e.g. 1000.00): ";
-    public static final String SUCCESSFUL_OPEN_ACCOUNT = "Your account number: %d\n";
+    public static final String SUCCESSFUL_OPEN_ACCOUNT = "You have successfully open new account.\n Your account number: %d\n";
 
     // Close Account UI Constant
     public static final String CLOSE_MSG = "Closing existing account!";
     public static final String CLOSE_NAME_MSG = "Enter your name: ";
     public static final String CLOSE_ACC_NUM_MSG = "Enter your account number: ";
     public static final String CLOSE_PASSWORD_MSG = "Enter your password: ";
-    public static final String SUCCESSFUL_CLOSE_ACCOUNT = "You have successfully close your account";
+    public static final String SUCCESSFUL_CLOSE_ACCOUNT = "You have successfully close your account.";
+
+    // Deposit Money UI Constant
+    public static final String DEPOSIT_MSG = "Deposit money!";
+    public static final String DEPOSIT_NAME_MSG = "Enter your name: ";
+    public static final String DEPOSIT_ACC_NUM_MSG = "Enter your account number: ";
+    public static final String DEPOSIT_PASSWORD_MSG = "Enter your password: ";
+    public static final String DEPOSIT_SELECT_CURRENCY_MSG = "Choose from the following currency: ";
+    public static final String DEPOSIT_CURRENCY_MSG = "Enter your currency: ";
+    public static final String DEPOSIT_BALANCE_MSG = "Enter your deposit balance (e.g. 1000.00): ";
+    public static final String SUCCESSFUL_DEPOSIT_ACCOUNT = "You have successfully deposit money.\n Your new balance: %s %f\n";
 
     // Confirmation UI Constant
     public static final String CONFIRM_SUMMARY = "Summary:";

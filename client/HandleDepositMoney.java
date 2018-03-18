@@ -4,54 +4,73 @@ import java.io.*;
 import java.lang.*;
 import java.util.*;
 
-class HandleCloseAccount{
+class HandleDepositMonet{
     public static byte[] createMessage(Scanner scanner)throws UnsupportedEncodingException{
         System.out.println(Constants.SEPARATOR);
-        System.out.println(Constants.CLOSE_MSG);
+        System.out.println(Constants.DEPOSIT_MSG);
 
         // Enter Name
-        System.out.print(Constants.CLOSE_NAME_MSG);
+        System.out.print(Constants.DEPOSIT_NAME_MSG);
         String name = scanner.nextLine();
         while(name.length() == 0){
             System.out.println(Constants.ERR_NAME_INPUT);
             System.out.println();
-            System.out.print(Constants.CLOSE_NAME_MSG);
+            System.out.print(Constants.DEPOSIT_NAME_MSG);
             name = scanner.nextLine();
         }
 
         // Enter Account Number
         // TODO: Handle error
-        System.out.print(Constants.CLOSE_ACC_NUM_MSG);
+        System.out.print(Constants.DEPOSIT_ACC_NUM_MSG);
         String accNumStr = scanner.nextLine();
         int accNum = Integer.parseInt(accNumStr);
 
         // Enter Password
-        System.out.print(Constants.CLOSE_PASSWORD_MSG);
+        System.out.print(Constants.DEPOSIT_PASSWORD_MSG);
         String password = scanner.nextLine();
         while(password.length() == 0){
             System.out.println(Constants.ERR_PASSWORD_INPUT);
             System.out.println();
-            System.out.print(Constants.CLOSE_PASSWORD_MSG);
+            System.out.print(Constants.DEPOSIT_PASSWORD_MSG);
             password = scanner.nextLine();
         }
 
+        // Enter Default Currency
+        // TODO: Handle error
+        System.out.println(Constants.DEPOSIT_SELECT_CURRENCY_MSG);
+        for (int i = 1; i < Constants.CURRENCY_STR.length; i++){
+            System.out.printf("%d. %s\n", i, Constants.CURRENCY_STR[i]);
+        }
+        System.out.print(Constants.DEPOSIT_CURRENCY_MSG);
+        String currencyStr = scanner.nextLine();
+        int currency = Integer.parseInt(currencyStr);
+
+        // Enter Starting Balance
+        // TODO: Handle error
+        System.out.print(Constants.DEPOSIT_BALANCE_MSG);
+        String balanceStr = scanner.nextLine();
+        float balance = Float.parseFloat(balanceStr);
+
         System.out.println();
-        boolean confirm = HandleCloseAccount.confirm(name, accNum, password, scanner);
+        boolean confirm = HandleDepositAccount.confirm(name, accNum, password, currency, balance, scanner);
         System.out.println();
 
         if (confirm){
-            return HandleCloseAccount.constructMessage(name, accNum, password);
+            return HandleDepositAccount.constructMessage(name, accNum, password, currency, balance);
         }
+
         return new byte[0];
     }
 
-    public static boolean confirm(String name, int accountNumber, String password, Scanner scanner){
+    public static boolean confirm(String name, int accountNumber, String password, int currency, float balance, Scanner scanner){
         System.out.print(Constants.SEPARATOR);
         System.out.println(Constants.CONFIRM_SUMMARY);
         System.out.println(Constants.SEPARATOR);
         System.out.printf(Constants.CONFIRM_NAME, name);
         System.out.printf(Constants.CONFIRM_ACCOUNT_NUMBER, accountNumber);
         System.out.printf(Constants.CONFIRM_PASSWORD, password);
+        System.out.printf(Constants.CONFIRM_CURRENCY, Constants.CURRENCY_STR[currency]);
+        System.out.printf(Constants.CONFIRM_BALANCE, balance);
         System.out.print(Constants.CONFIRM_MSG);
         String confirm = scanner.nextLine();
 
@@ -62,13 +81,15 @@ class HandleCloseAccount{
         }
     }
 
-    public static byte[] constructMessage(String name, int accountNumber, String password)throws UnsupportedEncodingException{
+    public static byte[] constructMessage(String name, int accountNumber, String password, int currency, float balance)throws UnsupportedEncodingException{
         List message = new ArrayList();
 
-        Utils.appendType(message, Constants.SERVICE_CLOSE_ACCOUNT);
+        Utils.appendType(message, Constants.SERVICE_DEPOSIT_MONEY);
         Utils.appendMessage(message, name);
         Utils.appendMessage(message, accountNumber);
         Utils.appendMessage(message, password);
+        Utils.appendMessage(message, currency);
+        Utils.appendMessage(message, balance);
 
         return Utils.byteUnboxing(message);
     }
@@ -83,7 +104,10 @@ class HandleCloseAccount{
                 System.out.printf(Constants.ERR_MSG, errMsg);
                 break;
             case Constants.ACK:
-                System.out.println(Constants.SUCCESSFUL_CLOSE_ACCOUNT);
+                // TODO: response should contain currency
+                float newBalance = Utils.unmarshalFloat(response, Constants.RESPONSE_TYPE_SIZE);
+                System.out.println(Constants.SUCCESS_MSG);
+                System.out.printf(Constants.SUCCESSFUL_DEPOSIT_ACCOUNT, 1, accountNumber);
                 break;
             default:
                 System.out.println(Constants.INVALID_RESPONSE);
