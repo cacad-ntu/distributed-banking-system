@@ -68,14 +68,31 @@ void Handler::service2(udp_server &server, char *p){
     char header[HEADER_SIZE];
     char response[1];
 
-    utils::marshalInt(1,header);
+    //utils::marshalInt(1,header);
     char *cur = response;
     
-    if(success) utils::marshalString(ACK_SUCCESS,cur);
-    else utils::marshalString(ACK_FAIL,cur);
-    
-    server.send(header,HEADER_SIZE);
-    server.send(response,1);
+    if(success){
+        utils::marshalInt(1,header);
+        utils::marshalString(ACK_SUCCESS,cur);
+
+        server.send(header,HEADER_SIZE);
+        server.send(response,1);
+    }
+    else{
+        string err = "Wrong account number, name, or password!";
+        utils::marshalInt(1+4+(int)err.size(),header);
+
+        utils::marshalString(ACK_FAIL,cur);
+        cur += 1;
+
+        utils::marshalInt((int)err.size(),cur);
+        cur += 4;
+
+        utils::marshalString(err,cur);
+
+        server.send(header,HEADER_SIZE);
+        server.send(response,1+4+(int)err.size());
+    }
 }
 
 void Handler::service3(udp_server &server, char *p){
