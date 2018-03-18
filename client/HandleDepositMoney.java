@@ -107,7 +107,7 @@ class HandleDepositMonet{
                 // TODO: response should contain currency
                 float newBalance = Utils.unmarshalFloat(response, Constants.RESPONSE_TYPE_SIZE);
                 System.out.println(Constants.SUCCESS_MSG);
-                System.out.printf(Constants.SUCCESSFUL_DEPOSIT_ACCOUNT, 1, accountNumber);
+                System.out.printf(Constants.SUCCESSFUL_DEPOSIT_ACCOUNT, 0, accountNumber);
                 break;
             default:
                 System.out.println(Constants.INVALID_RESPONSE);
