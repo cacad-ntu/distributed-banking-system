@@ -40,7 +40,7 @@ class Utils{
         return b[start] << 24 | (b[start+1] & 0xFF) << 16 | (b[start+2] & 0xFF) << 8 | (b[start+3] & 0xFF);
     }
 
-    public static String unmarshalMsgInteger(byte[] b, int start){
+    public static int unmarshalMsgInteger(byte[] b, int start){
         return Utils.unmarshalInteger(b, start+Constants.INT_SIZE);
     }
 
@@ -57,7 +57,7 @@ class Utils{
         return ByteBuffer.wrap(content).order(ByteOrder.BIG_ENDIAN).getFloat();
     }
 
-    public static String unmarshalMsgFloat(byte[] b, int start){
+    public static float unmarshalMsgFloat(byte[] b, int start){
         return Utils.unmarshalMsgFloat(b, start+Constants.INT_SIZE);
     }
 
