@@ -62,7 +62,7 @@ class Utils{
     }
 
     public static float unmarshalMsgFloat(byte[] b, int start){
-        return Utils.unmarshalMsgFloat(b, start+Constants.INT_SIZE);
+        return Utils.unmarshalFloat(b, start+Constants.INT_SIZE);
     }
 
 
