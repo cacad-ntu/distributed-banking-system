@@ -108,16 +108,16 @@ void Handler::service3(udp_server &server, char *p){
     amount = utils::unmarshalFloat(p);
     p += length;
 
-    float balance = acManager.deposit(accountNum,name,passw,currency,amount);
+    pair<int,float> balance = acManager.deposit(accountNum,name,passw,currency,amount);
 
     char header[HEADER_SIZE];
 
-    if(balance < -0.5){
+    if(balance.first < 0){
         string err;
-        if(EQUAL(balance,-1)) err = "Account number not found!";
-        else if(EQUAL(balance,-2)) err = "Wrong name!";
-        else if(EQUAL(balance,-3)) err = "Wrong password!";
-        else if(EQUAL(balance,-4)) err = "Currency mismatch!";
+        if(balance.first == -1) err = "Account number not found!";
+        else if(balance.first == -2) err = "Wrong name!";
+        else if(balance.first == -3) err = "Wrong password!";
+        else if(balance.first == -4) err = "Currency mismatch!";
         else err = "Unknown error!";
         
         utils::marshalInt(1+4+(int)err.size(),header);
@@ -138,16 +138,19 @@ void Handler::service3(udp_server &server, char *p){
         server.send(response,1+4+(int)err.size());
     }
     else{
-        char response[5];
+        char response[9];
         char *cur = response;
 
         utils::marshalString(ACK_SUCCESS,cur);
         cur += 1;
+
+        utils::marshalInt(balance.first,cur);
+        cur += 4;
         
-        utils::marshalFloat(balance,cur);
+        utils::marshalFloat(balance.second,cur);
     
         server.send(header,HEADER_SIZE);
-        server.send(response,5);
+        server.send(response,9);
     }
 }
 
@@ -181,17 +184,17 @@ void Handler::service4(udp_server &server, char *p){
     amount = utils::unmarshalFloat(p);
     p += length;
 
-    float balance = acManager.withdraw(accountNum,name,passw,currency,amount);
+    pair<int,float> balance = acManager.withdraw(accountNum,name,passw,currency,amount);
 
     char header[HEADER_SIZE];
 
-    if(balance < -0.5){
+    if(balance.first < 0){
         string err;
-        if(EQUAL(balance,-11)) err = "Account number not found!";
-        else if(EQUAL(balance,-12)) err = "Wrong name!";
-        else if(EQUAL(balance,-13)) err = "Wrong password!";
-        else if(EQUAL(balance,-14)) err = "Currency mismatch!";
-        else if(EQUAL(balance,-15)) err = "Unable to withdraw amount higher than balance!";
+        if(balance.first == -11) err = "Account number not found!";
+        else if(balance.first == -12) err = "Wrong name!";
+        else if(balance.first == -13) err = "Wrong password!";
+        else if(balance.first == -14) err = "Currency mismatch!";
+        else if(balance.first == -15) err = "Unable to withdraw amount higher than balance!";
         else err = "Unknown error!";
         
         utils::marshalInt(1+4+(int)err.size(),header);
@@ -212,16 +215,19 @@ void Handler::service4(udp_server &server, char *p){
         server.send(response,1+4+(int)err.size());
     }
     else{
-        char response[5];
+        char response[9];
         char *cur = response;
 
         utils::marshalString(ACK_SUCCESS,cur);
         cur += 1;
+
+        utils::marshalInt(balance.first,cur);
+        cur += 4;
         
-        utils::marshalFloat(balance,cur);
+        utils::marshalFloat(balance.second,cur);
     
         server.send(header,HEADER_SIZE);
-        server.send(response,5);
+        server.send(response,9);
     }
 }
 
@@ -274,27 +280,27 @@ void Handler::service6(udp_server &server, char *p){
     amount = utils::unmarshalFloat(p);
     p += length;
 
-    float balance = acManager.transfer(accountNum1,accountNum2,name1,name2,passw,currency,amount);
+    pair<int,float> balance = acManager.transfer(accountNum1,accountNum2,name1,name2,passw,currency,amount);
     char header[HEADER_SIZE];
 
-    if(balance < -0.5){
+    if(balance.first < 0){
         string err;
-        if(EQUAL(balance,-1)) err = "Account number not found!";
-        else if(EQUAL(balance,-2)) err = "Wrong name!";
-        else if(EQUAL(balance,-3)) err = "Wrong password!";
-        else if(EQUAL(balance,-4)) err = "Currency mismatch!";
-        else if(EQUAL(balance,-11)) err = "Account number not found!";
-        else if(EQUAL(balance,-12)) err = "Wrong name!";
-        else if(EQUAL(balance,-13)) err = "Wrong password!";
-        else if(EQUAL(balance,-14)) err = "Currency mismatch!";
-        else if(EQUAL(balance,-15)) err = "Unable to withdraw amount higher than balance!";
-        else if(EQUAL(balance,-21)) err = "Account number not found!";
-        else if(EQUAL(balance,-22)) err = "Account number of recipient not found!";
-        else if(EQUAL(balance,-23)) err = "Wrong name!";
-        else if(EQUAL(balance,-24)) err = "Wrong recipient name!";
-        else if(EQUAL(balance,-25)) err = "Wrong password!";
-        else if(EQUAL(balance,-26)) err = "Currency mismatch!";
-        else if(EQUAL(balance,-27)) err = "Recipient currency mismatch!";
+        if(balance.first == -1) err = "Account number not found!";
+        else if(balance.first == -2) err = "Wrong name!";
+        else if(balance.first == -3) err = "Wrong password!";
+        else if(balance.first == -4) err = "Currency mismatch!";
+        else if(balance.first == -11) err = "Account number not found!";
+        else if(balance.first == -12) err = "Wrong name!";
+        else if(balance.first == -13) err = "Wrong password!";
+        else if(balance.first == -14) err = "Currency mismatch!";
+        else if(balance.first == -15) err = "Unable to withdraw amount higher than balance!";
+        else if(balance.first == -21) err = "Account number not found!";
+        else if(balance.first == -22) err = "Account number of recipient not found!";
+        else if(balance.first == -23) err = "Wrong name!";
+        else if(balance.first == -24) err = "Wrong recipient name!";
+        else if(balance.first == -25) err = "Wrong password!";
+        else if(balance.first == -26) err = "Currency mismatch!";
+        else if(balance.first == -27) err = "Recipient currency mismatch!";
         else err = "Unknown error!";
         
         utils::marshalInt(1+4+(int)err.size(),header);
@@ -315,16 +321,19 @@ void Handler::service6(udp_server &server, char *p){
         server.send(response,1+4+(int)err.size());
     }
     else{
-        char response[5];
+        char response[9];
         char *cur = response;
 
         utils::marshalString(ACK_SUCCESS,cur);
         cur += 1;
+
+        utils::marshalInt(balance.first,cur);
+        cur += 4;
         
-        utils::marshalFloat(balance,cur);
+        utils::marshalFloat(balance.second,cur);
     
         server.send(header,HEADER_SIZE);
-        server.send(response,5);
+        server.send(response,9);
     }
 }
 

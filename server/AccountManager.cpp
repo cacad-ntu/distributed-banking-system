@@ -24,71 +24,71 @@ bool AccountManager::deleteAccount(int accountNumber, string name, string passw)
 	return true;
 }
 
-float AccountManager::deposit(int accountNumber, string name, string passw, int currency, float amount){
+pair<int,float> AccountManager::deposit(int accountNumber, string name, string passw, int currency, float amount){
 	if(!accounts.count(accountNumber))
-        return -1;
+        return {-1,-1};
     auto ptr = accounts[accountNumber];
 
     if(name.compare(ptr->getName()) != 0)
-        return -2;
+        return {-2,-2};
 
     if(passw.compare(ptr->getPassword()) != 0)
-        return -3;
+        return {-3,-3};
 
     if(currency != ptr->getCurrency())
-        return -4;
+        return {-4,-4};
 
     return ptr->addAmount(amount);
 }
 
-float AccountManager::withdraw(int accountNumber, string name, string passw, int currency, float amount){
+pair<int,float> AccountManager::withdraw(int accountNumber, string name, string passw, int currency, float amount){
 	if(!accounts.count(accountNumber))
-        return -11;
+        return {-11,-11};
     auto ptr = accounts[accountNumber];
 
     if(name.compare(ptr->getName()) != 0)
-        return -12;
+        return {-12,-12};
 
     if(passw.compare(ptr->getPassword()) != 0)
-        return -13;
+        return {-13,-13};
 
     if(currency != ptr->getCurrency())
-        return -14;
+        return {-14,-14};
 
     if(amount > ptr->getBalance())
-        return -15;
+        return {-15,-15};
 
     return ptr->subtractAmount(amount);
 }
 
-float AccountManager::transfer(int accountNum1, int accountNum2, string name1, string name2, string passw, int currency, float amount){
+pair<int,float> AccountManager::transfer(int accountNum1, int accountNum2, string name1, string name2, string passw, int currency, float amount){
     if(!accounts.count(accountNum1))
-        return -21;
+        return {-21,-21};
 
     if(!accounts.count(accountNum2))
-        return -22;
+        return {-22,-22};
 
     auto ptr1 = accounts[accountNum1];
     auto ptr2 = accounts[accountNum2];
 
     if(name1.compare(ptr1->getName()) != 0)
-        return -23;
+        return {-23,-23};
 
     if(name2.compare(ptr2->getName()) != 0)
-        return -24;
+        return {-24,-24};
 
     if(passw.compare(ptr1->getPassword()) != 0)
-        return -25;
+        return {-25,-25};
 
     if(currency != ptr1->getCurrency())
-        return -26;
+        return {-26,-26};
 
     if(currency != ptr2->getCurrency())
-        return -27;
+        return {-27,-27};
 
-    float balance = withdraw(accountNum1,name1,passw,currency,amount);
+    pair<int,float> balance = withdraw(accountNum1,name1,passw,currency,amount);
 
-    if(balance <= -1e-9) return balance;
+    if(currency < 0) return balance;
     return deposit(accountNum2,name2,passw,currency,amount);
 }
 

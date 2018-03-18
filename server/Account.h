@@ -17,8 +17,8 @@ public:
 	Account();
 	Account(int accountNumber_, string name_, string passw_, int currency_, float balance_);
 
-    float addAmount(float amount);
-    float subtractAmount(float amount);
+    pair<int,float> addAmount(float amount);
+    pair<int,float> subtractAmount(float amount);
 
     void changePassword(string passw_);
 };
