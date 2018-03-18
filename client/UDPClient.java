@@ -74,9 +74,10 @@ class UDPClient
                 int serviceType = Integer.parseInt(message);
                 System.out.println();
 
+                byte[] packageByte;
                 switch(serviceType){
                     case Constants.SERVICE_OPEN_ACCOUNT:
-                        byte[] packageByte = HandleOpenAccount.createMessage(scanner);
+                        packageByte = HandleOpenAccount.createMessage(scanner);
                         if (packageByte.length != 0){
                             udpClient.send(packageByte);
                             byte[] response = udpClient.receive();
@@ -84,22 +85,27 @@ class UDPClient
                         }
                         break;
                     case Constants.SERVICE_CLOSE_ACCOUNT:
-                        System.out.printf("Doing service: %s\n", message);
+                        packageByte = HandleCloseAccount.createMessage(scanner);
+                        if (packageByte.length != 0){
+                            udpClient.send(packageByte);
+                            byte[] response = udpClient.receive();
+                            HandleCloseAccount.handleResponse(response);
+                        }
                         break;
                     case Constants.SERVICE_DEPOSIT_MONEY:
-                        System.out.printf("Doing service: %s\n", message);
+                        System.out.printf("Service %s, comming soon\n", message);
                         break;
                     case Constants.SERVICE_WITHDRAW_MONEY:
-                        System.out.printf("Doing service: %s\n", message);
+                        System.out.printf("Service %s, comming soon\n", message);
                         break;
                     case Constants.SERVICE_MONITOR_UPDATE:
-                        System.out.printf("Doing service: %s\n", message);
+                        System.out.printf("Service %s, comming soon\n", message);
                         break;
                     case Constants.SERVICE_TRANSFER_MONEY:
-                        System.out.printf("Doing service: %s\n", message);
+                        System.out.printf("Service %s, comming soon\n", message);
                         break;
                     case Constants.SERVICE_CHANGE_PASSWORD:
-                        System.out.printf("Doing service: %s\n", message);
+                        System.out.printf("Service %s, comming soon\n", message);
                         break;
                     case Constants.SERVICE_EXIT:
                         System.out.println(Constants.EXIT_MSG);

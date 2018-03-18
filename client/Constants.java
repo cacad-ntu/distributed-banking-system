@@ -54,13 +54,20 @@ class Constants{
 
 
     // Open Account UI Constant
-    public static final String OPEN_MSG = "Opening new account:";
+    public static final String OPEN_MSG = "Opening new account!";
     public static final String OPEN_NAME_MSG = "Enter your name: ";
     public static final String OPEN_PASSWORD_MSG = "Enter your password: ";
     public static final String OPEN_SELECT_CURRENCY_MSG = "Choose from the following currency: ";
     public static final String OPEN_CURRENCY_MSG = "Enter your default currency: ";
     public static final String OPEN_BALANCE_MSG = "Enter your starting balance (e.g. 1000.00): ";
     public static final String SUCCESSFUL_OPEN_ACCOUNT = "Your account number: %d\n";
+
+    // Close Account UI Constant
+    public static final String CLOSE_MSG = "Closing existing account!";
+    public static final String CLOSE_NAME_MSG = "Enter your name: ";
+    public static final String CLOSE_ACC_NUM_MSG = "Enter your account number: ";
+    public static final String CLOSE_PASSWORD_MSG = "Enter your password: ";
+    public static final String SUCCESSFUL_CLOSE_ACCOUNT = "You have successfully close your account";
 
     // Confirmation UI Constant
     public static final String CONFIRM_SUMMARY = "Summary:";
