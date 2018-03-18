@@ -88,7 +88,7 @@ pair<int,float> AccountManager::transfer(int accountNum1, int accountNum2, strin
     pair<int,float> balance = withdraw(accountNum1,name1,passw,currency,amount);
 
     if(currency < 0) return balance;
-    return deposit(accountNum2,name2,passw,currency,amount);
+    return deposit(accountNum2,name2,ptr2->getPassword(),currency,amount);
 }
 
 bool AccountManager::changePassword(int accountNum, string name, string passw, string newPassw){
