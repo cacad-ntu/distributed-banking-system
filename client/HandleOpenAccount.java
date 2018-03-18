@@ -94,11 +94,11 @@ class HandleOpenAccount{
         int status = Integer.parseInt(statusStr);
         switch(status){
             case Constants.NAK:
-                String errMsg = Utils.unmarshalString(response, Constants.RESPONSE_TYPE_SIZE, response.length);
+                String errMsg = Utils.unmarshalMsgString(response, Constants.RESPONSE_TYPE_SIZE);
                 System.out.printf(Constants.ERR_MSG, errMsg);
                 break;
             case Constants.ACK:
-                int accountNumber = Utils.unmarshalInteger(response, Constants.RESPONSE_TYPE_SIZE);
+                int accountNumber = Utils.unmarshalMsgInteger(response, Constants.RESPONSE_TYPE_SIZE);
                 System.out.println(Constants.SUCCESS_MSG);
                 System.out.printf(Constants.SUCCESSFUL_OPEN_ACCOUNT, accountNumber);
                 break;

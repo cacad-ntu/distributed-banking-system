@@ -19,6 +19,12 @@ class Utils{
         return new String(c);
     }
 
+    public static String unmarshalMsgString(byte[] b, int start){
+        int len = Utils.unmarshalInteger(b, start);
+        int resStart = start + Constants.INT_SIZE;
+        return Utils.unmarshalString(b, resStart, resStart+len);
+    }
+
 
     // Marshal and unmarshal int
     public static byte[] marshal(int x){
@@ -34,6 +40,10 @@ class Utils{
         return b[start] << 24 | (b[start+1] & 0xFF) << 16 | (b[start+2] & 0xFF) << 8 | (b[start+3] & 0xFF);
     }
 
+    public static String unmarshalMsgInteger(byte[] b, int start){
+        return Utils.unmarshalInteger(b, start+Constants.INT_SIZE);
+    }
+
 
     // Marshal and unmarshal float
     public static byte[] marshal(float f){
@@ -45,6 +55,10 @@ class Utils{
             b[start], b[start+1], b[start+2], b[start+3]
         };
         return ByteBuffer.wrap(content).order(ByteOrder.BIG_ENDIAN).getFloat();
+    }
+
+    public static String unmarshalMsgFloat(byte[] b, int start){
+        return Utils.unmarshalMsgFloat(b, start+Constants.INT_SIZE);
     }
 
 

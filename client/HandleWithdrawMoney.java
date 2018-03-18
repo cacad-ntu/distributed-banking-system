@@ -100,12 +100,12 @@ class HandleWithdrawMoney{
         int status = Integer.parseInt(statusStr);
         switch(status){
             case Constants.NAK:
-                String errMsg = Utils.unmarshalString(response, Constants.RESPONSE_TYPE_SIZE, response.length);
+                String errMsg = Utils.unmarshalMsgString(response, Constants.RESPONSE_TYPE_SIZE);
                 System.out.printf(Constants.ERR_MSG, errMsg);
                 break;
             case Constants.ACK:
                 // TODO: response should contain currency
-                float newBalance = Utils.unmarshalFloat(response, Constants.RESPONSE_TYPE_SIZE);
+                float newBalance = Utils.unmarshalMsgFloat(response, Constants.RESPONSE_TYPE_SIZE);
                 System.out.println(Constants.SUCCESS_MSG);
                 System.out.printf(Constants.SUCCESSFUL_WITHDRAW_ACCOUNT, 0, newBalance);
                 break;
