@@ -60,7 +60,7 @@ class Constants{
     public static final String OPEN_SELECT_CURRENCY_MSG = "Choose from the following currency: ";
     public static final String OPEN_CURRENCY_MSG = "Enter default currency: ";
     public static final String OPEN_BALANCE_MSG = "Enter starting balance (e.g. 1000.00): ";
-    public static final String SUCCESSFUL_OPEN_ACCOUNT = "You have successfully open new account.\n Your account number: %d\n";
+    public static final String SUCCESSFUL_OPEN_ACCOUNT = "You have successfully open new account.\nYour account number: %d\n";
 
     // Close Account UI Constant
     public static final String CLOSE_MSG = "Closing existing account!";
@@ -85,7 +85,7 @@ class Constants{
     public static final String DEPOSIT_SELECT_CURRENCY_MSG = "Choose from the following currency: ";
     public static final String DEPOSIT_CURRENCY_MSG = "Enter currency: ";
     public static final String DEPOSIT_BALANCE_MSG = "Enter deposit balance (e.g. 1000.00): ";
-    public static final String SUCCESSFUL_DEPOSIT_MONEY = "You have successfully deposited money.\n Your new balance: %s %f\n";
+    public static final String SUCCESSFUL_DEPOSIT_MONEY = "You have successfully deposited money.\nYour new balance: %s %f\n";
 
     // Withdraw Money UI Constant
     public static final String WITHDRAW_MSG = "Withdraw money!";
@@ -95,7 +95,7 @@ class Constants{
     public static final String WITHDRAW_SELECT_CURRENCY_MSG = "Choose from the following currency: ";
     public static final String WITHDRAW_CURRENCY_MSG = "Enter currency: ";
     public static final String WITHDRAW_BALANCE_MSG = "Enter withdraw balance (e.g. 1000.00): ";
-    public static final String SUCCESSFUL_WITHDRAW_MONEY = "You have successfully withdrawn money.\n Your new balance: %s %f\n";
+    public static final String SUCCESSFUL_WITHDRAW_MONEY = "You have successfully withdrawn money.\nYour new balance: %s %f\n";
 
     // Transfer Money UI Constant
     public static final String TRANSFER_MSG = "Transfer money!";
@@ -107,7 +107,7 @@ class Constants{
     public static final String TRANSFER_SELECT_CURRENCY_MSG = "Choose from the following currency: ";
     public static final String TRANSFER_CURRENCY_MSG = "Enter currency: ";
     public static final String TRANSFER_BALANCE_MSG = "Enter transfer balance (e.g. 1000.00): ";
-    public static final String SUCCESSFUL_TRANSFER_MONEY = "You have successfully transferred money.\n Your new balance: %s %f\n";
+    public static final String SUCCESSFUL_TRANSFER_MONEY = "You have successfully transferred money.\nYour new balance: %s %f\n";
 
     // Confirmation UI Constant
     public static final String CONFIRM_SUMMARY = "Summary:";

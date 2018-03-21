@@ -59,9 +59,9 @@ class HandleOpenAccount{
     }
 
     public static boolean confirm(String name, String password, int currency, float balance, Scanner scanner){
-        System.out.print(Constants.SEPARATOR);
-        System.out.println(Constants.CONFIRM_SUMMARY);
         System.out.println(Constants.SEPARATOR);
+        System.out.println(Constants.CONFIRM_SUMMARY);
+        System.out.println();
         System.out.printf(Constants.CONFIRM_NAME, name);
         System.out.printf(Constants.CONFIRM_PASSWORD, password);
         System.out.printf(Constants.CONFIRM_CURRENCY, Constants.CURRENCY_STR[currency]);

@@ -56,9 +56,9 @@ class HandleChangePassword{
     }
 
     public static boolean confirm(String name, int accountNumber, String password, String newPassword, Scanner scanner){
-        System.out.print(Constants.SEPARATOR);
-        System.out.println(Constants.CONFIRM_SUMMARY);
         System.out.println(Constants.SEPARATOR);
+        System.out.println(Constants.CONFIRM_SUMMARY);
+        System.out.println();
         System.out.printf(Constants.CONFIRM_NAME, name);
         System.out.printf(Constants.CONFIRM_ACCOUNT_NUMBER, accountNumber);
         System.out.printf(Constants.CONFIRM_PASSWORD, password);

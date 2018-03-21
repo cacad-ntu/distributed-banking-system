@@ -63,9 +63,9 @@ class HandleWithdrawMoney{
     }
 
     public static boolean confirm(String name, int accountNumber, String password, int currency, float balance, Scanner scanner){
-        System.out.print(Constants.SEPARATOR);
-        System.out.println(Constants.CONFIRM_SUMMARY);
         System.out.println(Constants.SEPARATOR);
+        System.out.println(Constants.CONFIRM_SUMMARY);
+        System.out.println();
         System.out.printf(Constants.CONFIRM_NAME, name);
         System.out.printf(Constants.CONFIRM_ACCOUNT_NUMBER, accountNumber);
         System.out.printf(Constants.CONFIRM_PASSWORD, password);
@@ -111,7 +111,7 @@ class HandleWithdrawMoney{
                 float newBalance = Utils.unmarshalMsgFloat(response, ptr);
 
                 System.out.println(Constants.SUCCESS_MSG);
-                System.out.printf(Constants.SUCCESSFUL_DEPOSIT_MONEY, currency, newBalance);
+                System.out.printf(Constants.SUCCESSFUL_DEPOSIT_MONEY, Constants.CURRENCY_STR[currency], newBalance);
                 break;
             default:
                 System.out.println(Constants.INVALID_RESPONSE);
