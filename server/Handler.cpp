@@ -5,6 +5,8 @@ Handler::Handler(){
 }
 
 void Handler::notify(udp_server &server, string s){
+    if((int)admins.size() == 0) return;
+    
     char header[HEADER_SIZE];
 
     char *response = new char[4+(int)s.size()];
@@ -65,6 +67,8 @@ void Handler::service1(udp_server &server, char *p){
     
     server.send(header,HEADER_SIZE);
     server.send(response,9);
+
+    notify(server,"Opened a new account with name " + name + ", currency " + to_string(currency) + ", balance " + to_string(balance) + ".");
 }
 
 void Handler::service2(udp_server &server, char *p){
@@ -100,6 +104,8 @@ void Handler::service2(udp_server &server, char *p){
 
         server.send(header,HEADER_SIZE);
         server.send(response,1);
+
+        notify(server,"Deleted account no. " + to_string(accountNum) + " (" + name + ").");
     }
     else{
         
@@ -211,6 +217,8 @@ void Handler::service3(udp_server &server, char *p){
         utils::marshalInt(17,header);
         server.send(header,HEADER_SIZE);
         server.send(response,17);
+
+        notify(server,"Deposited " + to_string(amount) + " of currency " + to_string(currency) + " to account no. " + to_string(accountNum) + " (" + name + ") .");
     }
 }
 
@@ -295,6 +303,8 @@ void Handler::service4(udp_server &server, char *p){
         utils::marshalInt(17,header);
         server.send(header,HEADER_SIZE);
         server.send(response,17);
+
+        notify(server,"Withdrawn " + to_string(amount) + " of currency " + to_string(currency) + " from account no. " + to_string(accountNum) + " (" + name + ") .");
     }
 }
 
@@ -428,6 +438,8 @@ void Handler::service6(udp_server &server, char *p){
     
         server.send(header,HEADER_SIZE);
         server.send(response,17);
+
+        notify(server,"Transferred " + to_string(amount) + " of currency " + to_string(currency) + " from account no. " + to_string(accountNum1) + " (" + name1 + ") to account no. " + to_string(accountNum2) + " (" + name2 + ") .");
     }
 }
 
@@ -467,4 +479,6 @@ void Handler::service7(udp_server &server, char *p){
     
     server.send(header,HEADER_SIZE);
     server.send(response,1);
+
+    notify(server,"Changed password of account no. " + to_string(accountNum) + " (" + name + ").");
 }
