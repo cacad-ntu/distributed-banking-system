@@ -4,6 +4,27 @@ Handler::Handler(){
     acManager = AccountManager();
 }
 
+void Handler::notify(udp_server &server, string s){
+    char header[HEADER_SIZE];
+
+    char *response = new char[4+(int)s.size()];
+    char *cur = response;
+
+    utils::marshalInt((int)s.size(),cur);
+    cur += 4;
+    
+    utils::marshalString(s,cur);
+    cur += (int)s.size();
+
+    while(admins.size() && !admins[0].isAvailable())
+        admins.pop_front();
+    
+    for(auto admin:admins){
+        server.send(header,HEADER_SIZE,admin.getAddress(),admin.getLength());
+        server.send(response,4+(int)s.size(),admin.getAddress(),admin.getLength());
+    }
+}
+
 void Handler::service1(udp_server &server, char *p){
     int currency;
     float balance;
@@ -297,6 +318,12 @@ void Handler::service5(udp_server &server, char *p){
     p += 4;
     interval = utils::unmarshalInt(p);
     p += length;
+
+    auto clientAddress = server.getClientAddress();
+    auto clientLength  = server.getClientLength();
+    auto start = std::chrono::high_resolution_clock::now();
+
+    admins.push_back(Admin(clientAddress, clientLength, start, interval));
 }
 
 void Handler::service6(udp_server &server, char *p){
