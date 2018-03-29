@@ -8,6 +8,7 @@ void Handler::notify(udp_server &server, string s){
     if((int)admins.size() == 0) return;
     
     char header[HEADER_SIZE];
+    utils::marshalInt(4 + (int)s.size(), header);
 
     char *response = new char[4+(int)s.size()];
     char *cur = response;
