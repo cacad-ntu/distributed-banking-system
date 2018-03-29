@@ -278,6 +278,19 @@ void Handler::service4(udp_server &server, char *p){
 }
 
 void Handler::service5(udp_server &server, char *p){
+
+    /*
+      ### Service 5 - Monitor updates to all updates made to all bank account
+
+      ##### Message
+      - Interval in milliseconds (Integer)
+
+      ##### Response
+      - Account Update
+      - Message Type
+      - Details
+     */
+    
     int interval;
 
     int length = utils::unmarshalInt(p);
