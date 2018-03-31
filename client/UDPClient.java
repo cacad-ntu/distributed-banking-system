@@ -100,6 +100,10 @@ class UDPClient
             }
         } while(this.semInvo >= Constants.AT_MOST_ONE_SEM_INVO);
 
+        if(this.getSemInvo() >= Constants.AT_LEAST_ONE_SEM_INVO){
+            this.sendACK(curID);
+        }
+
         this.handledResponse.put(responseID, true);
         return Arrays.copyOfRange(receivePacket.getData(), Constants.INT_SIZE, messageLength);
     }
@@ -129,10 +133,6 @@ class UDPClient
                 continue;
             }
         } while(this.getSemInvo() >= Constants.AT_LEAST_ONE_SEM_INVO);
-
-        if(this.getSemInvo() >= Constants.AT_LEAST_ONE_SEM_INVO){
-            this.sendACK(curID);
-        }
         return response;
     }
 
