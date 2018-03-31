@@ -25,8 +25,10 @@ void Handler::notify(udp_server &server, string s, int status){
     
     for(auto admin:admins){
         char *cur = response;
-
-        utils::marshalInt(getResponseID(),cur);
+        
+        int responseID = getResponseID();
+        
+        utils::marshalInt(responseID,cur);
         cur += 4;
 
         utils::marshalInt((int)s.size(),cur);
@@ -39,8 +41,25 @@ void Handler::notify(udp_server &server, string s, int status){
         server.send(response,4+4+(int)s.size(),admin.getAddress(),admin.getLength());
 
         if(status >= 1){
-            server.receive(ackheader,HEADER_SIZE);
-            server.receive(ack,1);
+            while(1){
+                int n = server.receive_time(header,HEADER_SIZE);
+                if(n <= 0){
+                    server.send(header,HEADER_SIZE);
+                    server.send(response,4+4+(int)s.size());
+                    continue;
+                }
+                char* ack = new char[1];
+                n = server.receive_time(ack,1);
+                if(n <= 0){
+                    server.send(header,HEADER_SIZE);
+                    server.send(response,4+4+(int)s.size());
+                    continue;
+                }
+                char *x = ack;
+                x += 1;
+                int ack_id = utils::unmarshalInt(ack);
+                if(ack_id == responseID) break;
+            }
         }
     }
 }
@@ -90,7 +109,8 @@ void Handler::service1(udp_server &server, char *p, int req_id, int status){
     utils::marshalInt(4+1+4+4,header);
     char *cur = response;
 
-    utils::marshalInt(getResponseID(),cur);
+    int responseID = getResponseID();
+    utils::marshalInt(responseID,cur);
     cur += 4;
     
     utils::marshalString(ACK,cur);
@@ -107,9 +127,25 @@ void Handler::service1(udp_server &server, char *p, int req_id, int status){
     server.send(response,4+1+4+4);
 
     if(status >= 1){
-        server.receive(header,HEADER_SIZE);
-        char* ack = new char[1];
-        server.receive(ack,1);
+        while(1){
+            int n = server.receive_time(header,HEADER_SIZE);
+            if(n <= 0){
+                server.send(header,HEADER_SIZE);
+                server.send(response,4+1+4+4);
+                continue;
+            }
+            char* ack = new char[1];
+            n = server.receive_time(ack,1);
+            if(n <= 0){
+                server.send(header,HEADER_SIZE);
+                server.send(response,4+1+4+4);
+                continue;
+            }
+            char *x = ack;
+            x += 1;
+            int ack_id = utils::unmarshalInt(ack);
+            if(ack_id == responseID) break;
+        }
     }
     
     notify(server,"Opened a new account with name " + name + ", currency " + to_string(currency) + ", balance " + to_string(balance) + ".", status);
@@ -158,7 +194,9 @@ void Handler::service2(udp_server &server, char *p, int req_id, int status){
         cout << "Success deleting account\n";
 
         utils::marshalInt(4+1,header);
-        utils::marshalInt(getResponseID(),cur);
+
+        int responseID = getResponseID();
+        utils::marshalInt(responseID,cur);
         cur += 4;
 
         utils::marshalString(ACK_SUCCESS,cur);
@@ -169,9 +207,26 @@ void Handler::service2(udp_server &server, char *p, int req_id, int status){
         server.send(response,4+1);
 
         if(status >= 1){
-            server.receive(header,HEADER_SIZE);
-            char* ack = new char[1];
-            server.receive(ack,1);
+
+            while(1){
+                int n = server.receive_time(header,HEADER_SIZE);
+                if(n <= 0){
+                    server.send(header,HEADER_SIZE);
+                    server.send(response,4+1);
+                    continue;
+                }
+                char* ack = new char[1];
+                n = server.receive_time(ack,1);
+                if(n <= 0){
+                    server.send(header,HEADER_SIZE);
+                    server.send(response,4+1);
+                    continue;
+                }
+                char *x = ack;
+                x += 1;
+                int ack_id = utils::unmarshalInt(ack);
+                if(ack_id == responseID) break;
+            }
         }
         
         notify(server,"Deleted account no. " + to_string(accountNum) + " (" + name + ").", status);
@@ -186,7 +241,8 @@ void Handler::service2(udp_server &server, char *p, int req_id, int status){
 
         utils::marshalInt(4+1+4+(int)err.size(),header);
 
-        utils::marshalInt(getResponseID(),cur);
+        int responseID = getResponseID();
+        utils::marshalInt(responseID,cur);
         cur += 4;
         
         utils::marshalString(ACK_FAIL,cur);
@@ -203,9 +259,25 @@ void Handler::service2(udp_server &server, char *p, int req_id, int status){
         server.send(response,4+1+4+(int)err.size());
 
         if(status >= 1){
-            server.receive(header,HEADER_SIZE);
-            char* ack = new char[1];
-            server.receive(ack,1);
+            while(1){
+                int n = server.receive_time(header,HEADER_SIZE);
+                if(n <= 0){
+                    server.send(header,HEADER_SIZE);
+                    server.send(response,4+1+4+(int)err.size());
+                    continue;
+                }
+                char* ack = new char[1];
+                n = server.receive_time(ack,1);
+                if(n <= 0){
+                    server.send(header,HEADER_SIZE);
+                    server.send(response,4+1+4+(int)err.size());
+                    continue;
+                }
+                char *x = ack;
+                x += 1;
+                int ack_id = utils::unmarshalInt(ack);
+                if(ack_id == responseID) break;
+            }
         }
     }
 }
@@ -269,7 +341,8 @@ void Handler::service3(udp_server &server, char *p, int req_id, int status){
         char *response = new char[4+1+4+(int)err.size()];
         char *cur = response;
 
-        utils::marshalInt(getResponseID(),cur);
+        int responseID = getResponseID();
+        utils::marshalInt(responseID,cur);
         cur += 4;
 
         utils::marshalString(ACK_FAIL,cur);
@@ -287,9 +360,25 @@ void Handler::service3(udp_server &server, char *p, int req_id, int status){
         server.send(response,4+1+4+(int)err.size());
 
         if(status >= 1){
-            server.receive(header,HEADER_SIZE);
-            char* ack = new char[1];
-            server.receive(ack,1);
+            while(1){
+                int n = server.receive_time(header,HEADER_SIZE);
+                if(n <= 0){
+                    server.send(header,HEADER_SIZE);
+                    server.send(response,4+1+4+(int)err.size());
+                    continue;
+                }
+                char* ack = new char[1];
+                n = server.receive_time(ack,1);
+                if(n <= 0){
+                    server.send(header,HEADER_SIZE);
+                    server.send(response,4+1+4+(int)err.size());
+                    continue;
+                }
+                char *x = ack;
+                x += 1;
+                int ack_id = utils::unmarshalInt(ack);
+                if(ack_id == responseID) break;
+            }
         }
     }
     else{
@@ -297,8 +386,9 @@ void Handler::service3(udp_server &server, char *p, int req_id, int status){
         char *cur = response;
 
         utils::marshalInt(4+1+4+4+4+4,header);
-        
-        utils::marshalInt(getResponseID(),cur);
+
+        int responseID = getResponseID();
+        utils::marshalInt(responseID,cur);
         cur += 4;
 
         utils::marshalString(ACK_SUCCESS,cur);
@@ -321,9 +411,25 @@ void Handler::service3(udp_server &server, char *p, int req_id, int status){
         server.send(response,4+1+4+4+4+4);
 
         if(status >= 1){
-            server.receive(header,HEADER_SIZE);
-            char* ack = new char[1];
-            server.receive(ack,1);
+            while(1){
+                int n = server.receive_time(header,HEADER_SIZE);
+                if(n <= 0){
+                    server.send(header,HEADER_SIZE);
+                    server.send(response,4+1+4+4+4+4);
+                    continue;
+                }
+                char* ack = new char[1];
+                n = server.receive_time(ack,1);
+                if(n <= 0){
+                    server.send(header,HEADER_SIZE);
+                    server.send(response,4+1+4+4+4+4);
+                    continue;
+                }
+                char *x = ack;
+                x += 1;
+                int ack_id = utils::unmarshalInt(ack);
+                if(ack_id == responseID) break;
+            }
         }
         
         notify(server,"Deposited " + to_string(amount) + " of currency " + to_string(currency) + " to account no. " + to_string(accountNum) + " (" + name + ") .", status);
@@ -390,7 +496,8 @@ void Handler::service4(udp_server &server, char *p, int req_id, int status){
         char *response = new char[4+1+4+(int)err.size()];
         char *cur = response;
 
-        utils::marshalInt(getResponseID(),cur);
+        int responseID = getResponseID();
+        utils::marshalInt(responseID,cur);
         cur += 4;
         
         utils::marshalString(ACK_FAIL,cur);
@@ -408,9 +515,25 @@ void Handler::service4(udp_server &server, char *p, int req_id, int status){
         server.send(response,4+1+4+(int)err.size());
 
         if(status >= 1){
-            server.receive(header,HEADER_SIZE);
-            char* ack = new char[1];
-            server.receive(ack,1);
+            while(1){
+                int n = server.receive_time(header,HEADER_SIZE);
+                if(n <= 0){
+                    server.send(header,HEADER_SIZE);
+                    server.send(response,4+1+4+(int)err.size());
+                    continue;
+                }
+                char* ack = new char[1];
+                n = server.receive_time(ack,1);
+                if(n <= 0){
+                    server.send(header,HEADER_SIZE);
+                    server.send(response,4+1+4+(int)err.size());
+                    continue;
+                }
+                char *x = ack;
+                x += 1;
+                int ack_id = utils::unmarshalInt(ack);
+                if(ack_id == responseID) break;
+            }
         }
     }
     else{
@@ -419,7 +542,8 @@ void Handler::service4(udp_server &server, char *p, int req_id, int status){
 
         utils::marshalInt(4+1+4+4+4+4,header);
 
-        utils::marshalInt(getResponseID(),cur);
+        int responseID = getResponseID();
+        utils::marshalInt(responseID,cur);
         cur += 4;
         
         utils::marshalString(ACK_SUCCESS,cur);
@@ -442,9 +566,25 @@ void Handler::service4(udp_server &server, char *p, int req_id, int status){
         server.send(response,4+1+4+4+4+4);
 
         if(status >= 1){
-            server.receive(header,HEADER_SIZE);
-            char* ack = new char[1];
-            server.receive(ack,1);
+            while(1){
+                int n = server.receive_time(header,HEADER_SIZE);
+                if(n <= 0){
+                    server.send(header,HEADER_SIZE);
+                    server.send(response,4+1+4+4+4+4);
+                    continue;
+                }
+                char* ack = new char[1];
+                n = server.receive_time(ack,1);
+                if(n <= 0){
+                    server.send(header,HEADER_SIZE);
+                    server.send(response,4+1+4+4+4+4);
+                    continue;
+                }
+                char *x = ack;
+                x += 1;
+                int ack_id = utils::unmarshalInt(ack);
+                if(ack_id == responseID) break;
+            }
         }
         
         notify(server,"Withdrawn " + to_string(amount) + " of currency " + to_string(currency) + " from account no. " + to_string(accountNum) + " (" + name + ") .", status);
@@ -484,7 +624,8 @@ void Handler::service5(udp_server &server, char *p, int req_id, int status){
     char *cur = response;
     utils::marshalInt(4+1,header);
 
-    utils::marshalInt(getResponseID(),cur);
+    int responseID = getResponseID();
+    utils::marshalInt(responseID,cur);
     cur += 4;
 
     utils::marshalString(ACK_SUCCESS,cur);
@@ -495,9 +636,25 @@ void Handler::service5(udp_server &server, char *p, int req_id, int status){
     server.send(response,4+1);
 
     if(status >= 1){
-        server.receive(header,HEADER_SIZE);
-        char* ack = new char[1];
-        server.receive(ack,1);
+        while(1){
+            int n = server.receive_time(header,HEADER_SIZE);
+            if(n <= 0){
+                server.send(header,HEADER_SIZE);
+                server.send(response,4+1);
+                continue;
+            }
+            char* ack = new char[1];
+            n = server.receive_time(ack,1);
+            if(n <= 0){
+                server.send(header,HEADER_SIZE);
+                server.send(response,4+1);
+                continue;
+            }
+            char *x = ack;
+            x += 1;
+            int ack_id = utils::unmarshalInt(ack);
+            if(ack_id == responseID) break;
+        }
     }
 }
 
@@ -581,7 +738,8 @@ void Handler::service6(udp_server &server, char *p, int req_id, int status){
         char *response = new char[4+1+4+(int)err.size()];
         char *cur = response;
 
-        utils::marshalInt(getResponseID(),cur);
+        int responseID = getResponseID();
+        utils::marshalInt(responseID,cur);
         cur += 4;
         
         utils::marshalString(ACK_FAIL,cur);
@@ -599,16 +757,33 @@ void Handler::service6(udp_server &server, char *p, int req_id, int status){
         server.send(response,4+1+4+(int)err.size());
 
         if(status >= 1){
-            server.receive(header,HEADER_SIZE);
-            char* ack = new char[1];
-            server.receive(ack,1);
+            while(1){
+                int n = server.receive_time(header,HEADER_SIZE);
+                if(n <= 0){
+                    server.send(header,HEADER_SIZE);
+                    server.send(response,4+1+4+(int)err.size());
+                    continue;
+                }
+                char* ack = new char[1];
+                n = server.receive_time(ack,1);
+                if(n <= 0){
+                    server.send(header,HEADER_SIZE);
+                    server.send(response,4+1+4+(int)err.size());
+                    continue;
+                }
+                char *x = ack;
+                x += 1;
+                int ack_id = utils::unmarshalInt(ack);
+                if(ack_id == responseID) break;
+            }
         }
     }
     else{
         char response[4+1+4+4+4+4];
         char *cur = response;
 
-        utils::marshalInt(getResponseID(),cur);
+        int responseID = getResponseID();
+        utils::marshalInt(responseID,cur);
         cur += 4;
 
         utils::marshalString(ACK_SUCCESS,cur);
@@ -633,9 +808,25 @@ void Handler::service6(udp_server &server, char *p, int req_id, int status){
         server.send(response,4+1+4+4+4+4);
 
         if(status >= 1){
-            server.receive(header,HEADER_SIZE);
-            char* ack = new char[1];
-            server.receive(ack,1);
+            while(1){
+                int n = server.receive_time(header,HEADER_SIZE);
+                if(n <= 0){
+                    server.send(header,HEADER_SIZE);
+                    server.send(response,4+1+4+4+4+4);
+                    continue;
+                }
+                char* ack = new char[1];
+                n = server.receive_time(ack,1);
+                if(n <= 0){
+                    server.send(header,HEADER_SIZE);
+                    server.send(response,4+1+4+4+4+4);
+                    continue;
+                }
+                char *x = ack;
+                x += 1;
+                int ack_id = utils::unmarshalInt(ack);
+                if(ack_id == responseID) break;
+            }
         }
         notify(server,"Transferred " + to_string(amount) + " of currency " + to_string(currency) + " from account no. " + to_string(accountNum1) + " (" + name1 + ") to account no. " + to_string(accountNum2) + " (" + name2 + ") .", status);
     }
@@ -685,7 +876,8 @@ void Handler::service7(udp_server &server, char *p, int req_id, int status){
     utils::marshalInt(4+1,header);
     char *cur = response;
 
-    utils::marshalInt(getResponseID(),cur);
+    int responseID = getResponseID();
+    utils::marshalInt(responseID,cur);
     cur += 4;
     
     if(success) utils::marshalString(ACK_SUCCESS,cur);
@@ -697,9 +889,25 @@ void Handler::service7(udp_server &server, char *p, int req_id, int status){
     server.send(response,4+1);
 
     if(status >= 1){
-        server.receive(header,HEADER_SIZE);
-        char* ack = new char[1];
-        server.receive(ack,1);
+        while(1){
+            int n = server.receive_time(header,HEADER_SIZE);
+            if(n <= 0){
+                server.send(header,HEADER_SIZE);
+                server.send(response,4+1);
+                continue;
+            }
+            char* ack = new char[1];
+            n = server.receive_time(ack,1);
+            if(n <= 0){
+                server.send(header,HEADER_SIZE);
+                server.send(response,4+1);
+                continue;
+            }
+            char *x = ack;
+            x += 1;
+            int ack_id = utils::unmarshalInt(ack);
+            if(ack_id == responseID) break;
+        }
     }
     
     notify(server,"Changed password of account no. " + to_string(accountNum) + " (" + name + ").", status);

@@ -1,15 +1,22 @@
 #include "udp_server.h"
-void udp_server::receive(char *buf, size_t bufsize){
+int udp_server::receive(char *buf, size_t bufsize){
+    optval = 1;
+    setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, (const void *)&optval , sizeof(int));
     n = recvfrom(sockfd, buf, bufsize, 0, (struct sockaddr *) &clientaddr, &clientlen);
     if (n < 0) perror("ERROR in recvfrom");
+    printf("server received %d bytes\n", n);
+    return n;
+}
 
-    hostp = gethostbyaddr((const char *)&clientaddr.sin_addr.s_addr, sizeof(clientaddr.sin_a\
-ddr.s_addr), AF_INET);
-    if (hostp == NULL) perror("ERROR on gethostbyaddr");
-    hostaddrp = inet_ntoa(clientaddr.sin_addr);
-    if (hostaddrp == NULL) perror("ERROR on inet_ntoa\n");
-    printf("server received datagram from %s (%s)\n", hostp->h_name, hostaddrp);
-    printf("server received %d/%d bytes: %d\n", strlen(buf), n, (int)(buf[0]));
+int udp_server::receive_time(char *buf, size_t bufsize){
+    tv.tv_sec = 1;
+    tv.tv_usec = 0;
+    setsockopt(sockfd, SOL_SOCKET, SO_RCVTIMEO, (const char*)&tv, sizeof tv);
+    
+    n = recvfrom(sockfd, buf, bufsize, 0, (struct sockaddr *) &clientaddr, &clientlen);
+    if (n < 0) perror("ERROR in recvfrom");
+    printf("server received %d bytes\n", n);
+    return n;
 }
 
 void udp_server::send(const char *buf, size_t bufsize){
@@ -28,14 +35,7 @@ udp_server::udp_server(int port){
         perror("ERROR opening socket");
         return;
     }
-
-    tv.tv_sec = 1;
-    tv.tv_usec = 0;
-    setsockopt(sockfd, SOL_SOCKET, SO_RCVTIMEO, (const char*)&tv, sizeof tv);
-
-    //optval = 1;
-    //setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, (const void *)&optval , sizeof(int));
-
+    
     bzero((char *) &serveraddr, sizeof(serveraddr));
     serveraddr.sin_family = AF_INET;
     serveraddr.sin_addr.s_addr = htonl(INADDR_ANY);

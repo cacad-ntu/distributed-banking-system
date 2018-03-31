@@ -21,12 +21,15 @@ void send(udp_server &server){
 
 void receive(udp_server &server){
     cout << "WAITING\n";
-    server.receive(header,HEADER_SIZE);
+    int n = server.receive(header,HEADER_SIZE);
+    
     message_length = utils::unmarshalInt(header);
     cout << "Msg length: " << message_length << '\n';
     
     buffer = new char[message_length];
-    server.receive(buffer,message_length);
+    n = server.receive_time(buffer,message_length);
+
+    if(n <= 0) return;
     
     char *cur = buffer;
 
