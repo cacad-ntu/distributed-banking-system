@@ -17,7 +17,9 @@ class Handler{
     deque<Admin> admins;
     AccountManager acManager;
     map<pair<unsigned long,int>,char*> memo;
+    int response_id;
  public:
+    int getResponseID();
     void notify(udp_server &server, string s);
     void service1(udp_server &server, char *p, int req_id, bool at_most_one);
     void service2(udp_server &server, char *p, int req_id, bool at_most_one);
