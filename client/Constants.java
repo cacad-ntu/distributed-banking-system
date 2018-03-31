@@ -9,6 +9,7 @@ class Constants{
     public static final double FAILURE_RATE = 1.0;
     public static final int RESPONSE_TYPE_SIZE = 1;
     public static final int TIMEOUT = 1000;
+    public static final int NO_TIMEOUT = 0;
     public static final String INVALID_RESPONSE = "Sorry we are having problem in the server";
     public static final String TIMEOUT_MSG = "Timeout!, resending request ...";
 

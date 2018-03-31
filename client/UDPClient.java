@@ -17,7 +17,7 @@ class UDPClient
 
     public UDPClient(String ip, int port) throws SocketException, UnknownHostException{
         this.clientSocket = new DatagramSocket();
-        this.clientSocket.setSoTimeout(Constants.TIMEOUT);
+        this.clientSocket.setSoTimeout(Constants.NO_TIMEOUT);
         this.IPAddress = InetAddress.getByName(ip);
         this.port = port;
         this.failureRate = Constants.FAILURE_RATE;
@@ -56,7 +56,7 @@ class UDPClient
         this.clientSocket.send(sendPacket);
     }
 
-    public byte[] receive() throws IOException{
+    public byte[] receive() throws IOException, InterruptedException{
         int responseID;
         int messageLength;
         DatagramPacket receivePacket;
