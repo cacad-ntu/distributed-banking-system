@@ -14,5 +14,10 @@ java -cp .;lib\* client.UDPClient -h <HOST NAME> -p <PORT> [-al] [-am] [-fr <FAI
 ```
 cd server
 g++ -o server -std=c++11 main.cpp udp_server.cpp utils.cpp Handler.cpp AccountManager.cpp Account.cpp Admin.cpp
-./server
+./server <PORT> <MODE>
 ```
+Note: <MODE> is the invocation semantic. Possible values:
+
+- 0: no ack
+- 1: at-least-once
+- 2: at-most-once
