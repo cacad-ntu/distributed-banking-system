@@ -19,13 +19,13 @@ class Handler{
     map<pair<unsigned long,int>,char*> memo;
  public:
     void notify(udp_server &server, string s);
-    void service1(udp_server &server, char *p, int req_id);
-    void service2(udp_server &server, char *p, int req_id);
-    void service3(udp_server &server, char *p, int req_id);
-    void service4(udp_server &server, char *p, int req_id);
-    void service5(udp_server &server, char *p, int req_id);
-    void service6(udp_server &server, char *p, int req_id);
-    void service7(udp_server &server, char *p, int req_id);
+    void service1(udp_server &server, char *p, int req_id, bool at_most_one);
+    void service2(udp_server &server, char *p, int req_id, bool at_most_one);
+    void service3(udp_server &server, char *p, int req_id, bool at_most_one);
+    void service4(udp_server &server, char *p, int req_id, bool at_most_one);
+    void service5(udp_server &server, char *p, int req_id, bool at_most_one);
+    void service6(udp_server &server, char *p, int req_id, bool at_most_one);
+    void service7(udp_server &server, char *p, int req_id, bool at_most_one);
 
     Handler();
 };

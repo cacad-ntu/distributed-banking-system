@@ -28,10 +28,10 @@ void Handler::notify(udp_server &server, string s){
     }
 }
 
-void Handler::service1(udp_server &server, char *p, int req_id){
+void Handler::service1(udp_server &server, char *p, int req_id, bool at_most_once){
     unsigned long cAddress = server.getClientAddress().sin_addr.s_addr;
 
-    if(memo.count({cAddress,req_id})){
+    if(at_most_once && memo.count({cAddress,req_id})){
         char header[HEADER_SIZE];
         char *response = memo[{cAddress,req_id}];
         
@@ -78,7 +78,7 @@ void Handler::service1(udp_server &server, char *p, int req_id){
     cur += 4;
     utils::marshalInt(accountNum,cur);
 
-    memo[{cAddress,req_id}] = response;
+    if(at_most_once) memo[{cAddress,req_id}] = response;
     
     server.send(header,HEADER_SIZE);
     server.send(response,9);
@@ -86,10 +86,10 @@ void Handler::service1(udp_server &server, char *p, int req_id){
     notify(server,"Opened a new account with name " + name + ", currency " + to_string(currency) + ", balance " + to_string(balance) + ".");
 }
 
-void Handler::service2(udp_server &server, char *p, int req_id){
+void Handler::service2(udp_server &server, char *p, int req_id, bool at_most_once){
     unsigned long cAddress = server.getClientAddress().sin_addr.s_addr;
 
-    if(memo.count({cAddress,req_id})){
+    if(at_most_once && memo.count({cAddress,req_id})){
         char header[HEADER_SIZE];
         char *response = memo[{cAddress,req_id}];
         
@@ -129,7 +129,7 @@ void Handler::service2(udp_server &server, char *p, int req_id){
         utils::marshalInt(1,header);
         utils::marshalString(ACK_SUCCESS,cur);
 
-        memo[{cAddress,req_id}] = response;
+        if(at_most_once) memo[{cAddress,req_id}] = response;
 
         server.send(header,HEADER_SIZE);
         server.send(response,1);
@@ -154,7 +154,7 @@ void Handler::service2(udp_server &server, char *p, int req_id){
 
         utils::marshalString(err,cur);
 
-        memo[{cAddress,req_id}] = response;
+        if(at_most_once) memo[{cAddress,req_id}] = response;
 
         cout << "sending\n";
 
@@ -168,10 +168,10 @@ void Handler::service2(udp_server &server, char *p, int req_id){
     }
 }
 
-void Handler::service3(udp_server &server, char *p, int req_id){
+void Handler::service3(udp_server &server, char *p, int req_id, bool at_most_once){
     unsigned long cAddress = server.getClientAddress().sin_addr.s_addr;
 
-    if(memo.count({cAddress,req_id})){
+    if(at_most_once && memo.count({cAddress,req_id})){
         char header[HEADER_SIZE];
         char *response = memo[{cAddress,req_id}];
         
@@ -236,7 +236,7 @@ void Handler::service3(udp_server &server, char *p, int req_id){
         utils::marshalString(err,cur);
         cur += (int)err.size();
 
-        memo[{cAddress,req_id}] = response;
+        if(at_most_once) memo[{cAddress,req_id}] = response;
 
         server.send(header,HEADER_SIZE);
         server.send(response,1+4+(int)err.size());
@@ -261,7 +261,7 @@ void Handler::service3(udp_server &server, char *p, int req_id){
 
         utils::marshalInt(17,header);
 
-        memo[{cAddress,req_id}] = response;
+        if(at_most_once) memo[{cAddress,req_id}] = response;
         
         server.send(header,HEADER_SIZE);
         server.send(response,17);
@@ -270,10 +270,10 @@ void Handler::service3(udp_server &server, char *p, int req_id){
     }
 }
 
-void Handler::service4(udp_server &server, char *p, int req_id){
+void Handler::service4(udp_server &server, char *p, int req_id, bool at_most_once){
     unsigned long cAddress = server.getClientAddress().sin_addr.s_addr;
 
-    if(memo.count({cAddress,req_id})){
+    if(at_most_once && memo.count({cAddress,req_id})){
         char header[HEADER_SIZE];
         char *response = memo[{cAddress,req_id}];
         
@@ -339,7 +339,7 @@ void Handler::service4(udp_server &server, char *p, int req_id){
         utils::marshalString(err,cur);
         cur += (int)err.size();
 
-        memo[{cAddress,req_id}] = response;
+        if(at_most_once) memo[{cAddress,req_id}] = response;
 
         server.send(header,HEADER_SIZE);
         server.send(response,1+4+(int)err.size());
@@ -364,7 +364,7 @@ void Handler::service4(udp_server &server, char *p, int req_id){
 
         utils::marshalInt(17,header);
 
-        memo[{cAddress,req_id}] = response;
+        if(at_most_once) memo[{cAddress,req_id}] = response;
         
         server.send(header,HEADER_SIZE);
         server.send(response,17);
@@ -373,7 +373,7 @@ void Handler::service4(udp_server &server, char *p, int req_id){
     }
 }
 
-void Handler::service5(udp_server &server, char *p, int req_id){
+void Handler::service5(udp_server &server, char *p, int req_id, bool at_most_once){
     unsigned long cAddress = server.getClientAddress().sin_addr.s_addr;
 
     /*
@@ -402,10 +402,10 @@ void Handler::service5(udp_server &server, char *p, int req_id){
     admins.push_back(Admin(clientAddress, clientLength, start, interval));
 }
 
-void Handler::service6(udp_server &server, char *p, int req_id){
+void Handler::service6(udp_server &server, char *p, int req_id, bool at_most_once){
     unsigned long cAddress = server.getClientAddress().sin_addr.s_addr;
 
-    if(memo.count({cAddress,req_id})){
+    if(at_most_once && memo.count({cAddress,req_id})){
         char header[HEADER_SIZE];
         char *response = memo[{cAddress,req_id}];
         
@@ -491,7 +491,7 @@ void Handler::service6(udp_server &server, char *p, int req_id){
         utils::marshalString(err,cur);
         cur += (int)err.size();
 
-        memo[{cAddress,req_id}] = response;
+        if(at_most_once) memo[{cAddress,req_id}] = response;
 
         server.send(header,HEADER_SIZE);
         server.send(response,1+4+(int)err.size());
@@ -516,7 +516,7 @@ void Handler::service6(udp_server &server, char *p, int req_id){
 
         utils::marshalInt(17,header);
 
-        memo[{cAddress,req_id}] = response;
+        if(at_most_once) memo[{cAddress,req_id}] = response;
     
         server.send(header,HEADER_SIZE);
         server.send(response,17);
@@ -525,10 +525,10 @@ void Handler::service6(udp_server &server, char *p, int req_id){
     }
 }
 
-void Handler::service7(udp_server &server, char *p, int req_id){
+void Handler::service7(udp_server &server, char *p, int req_id, bool at_most_once){
     unsigned long cAddress = server.getClientAddress().sin_addr.s_addr;
 
-    if(memo.count({cAddress,req_id})){
+    if(at_most_once && memo.count({cAddress,req_id})){
         char header[HEADER_SIZE];
         char *response = memo[{cAddress,req_id}];
         
@@ -571,7 +571,7 @@ void Handler::service7(udp_server &server, char *p, int req_id){
     if(success) utils::marshalString(ACK_SUCCESS,cur);
     else utils::marshalString(ACK_FAIL,cur);
 
-    memo[{cAddress,req_id}] = response;
+    if(at_most_once) memo[{cAddress,req_id}] = response;
     
     server.send(header,HEADER_SIZE);
     server.send(response,1);
