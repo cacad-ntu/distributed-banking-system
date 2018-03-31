@@ -25,6 +25,9 @@ private:
     char *hostaddrp; /* dotted decimal host addr string */
     int optval; /* flag value for setsockopt */
     int n; /* message byte size */
+
+    struct timeval tv;
+    
 public:
     void receive(char *buf, size_t bufsize);
     void send(const char *buf, size_t bufsize);
