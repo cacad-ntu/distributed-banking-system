@@ -10,15 +10,44 @@ class UDPClient
     private DatagramSocket clientSocket;
     private InetAddress IPAddress;
     private int port;
+    private double failureRate;
+    private int idCounter;
+    private int semInvo;
+    private Map<Integer, Boolean> handledResponse;
 
     public UDPClient(String ip, int port) throws SocketException, UnknownHostException{
-        this.clientSocket = new DatagramSocket(8000);
+        this.clientSocket = new DatagramSocket();
+        this.clientSocket.setSoTimeout(Constants.TIMEOUT);
         this.IPAddress = InetAddress.getByName(ip);
         this.port = port;
+        this.failureRate = Constants.FAILURE_RATE;
+        this.idCounter = 0;
+        this.semInvo = Constants.NO_SEM_INVO;
+        this.handledResponse = new HashMap<Integer, Boolean>();
+    }
+
+    public void setFailureRate(double failureRate){
+        this.failureRate = failureRate;
+    }
+
+    public void setSemInvo(int semInvo){
+        this.semInvo = semInvo;
+    }
+
+    public int getID(){
+        this.idCounter++;
+        return this.idCounter;
+    }
+
+    public int getSemInvo(){
+        return this.semInvo;
     }
 
     public void send(byte[] message) throws IOException, InterruptedException{
-        // TODO: convert header packet as attribute
+        if (Math.random() > this.failureRate){
+            return;
+        }
+
         byte[] header = Utils.marshal(message.length);
         DatagramPacket headerPacket = new DatagramPacket(header, header.length, this.IPAddress, this.port);
         this.clientSocket.send(headerPacket);
@@ -28,18 +57,48 @@ class UDPClient
     }
 
     public byte[] receive() throws IOException{
-        // TODO: convert header packet as attribute
-        byte[] header = new byte[4];
-        DatagramPacket headerPacket = new DatagramPacket(header, header.length);
-        this.clientSocket.receive(headerPacket);
+        int responseID;
+        int messageLength;
+        DatagramPacket receivePacket;
+        do{
+            byte[] header = new byte[4];
+            DatagramPacket headerPacket = new DatagramPacket(header, header.length);
+            this.clientSocket.receive(headerPacket);
 
-        int messageLength = Utils.unmarshalInteger(headerPacket.getData(), 0);
+            messageLength = Utils.unmarshalInteger(headerPacket.getData(), 0);
 
-        byte[] receiveData = new byte[messageLength];
-        DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
-        this.clientSocket.receive(receivePacket);
+            byte[] receiveData = new byte[messageLength];
+            receivePacket = new DatagramPacket(receiveData, receiveData.length);
+            this.clientSocket.receive(receivePacket);
+            responseID = Utils.unmarshalInteger(receivePacket.getData(), 0);
+        } while (handledResponse.containsKey(responseID));
 
-        return receivePacket.getData();
+        handledResponse.put(responseID, true);
+        return Arrays.copyOfRange(receivePacket.getData(), Constants.INT_SIZE, messageLength);
+    }
+
+    public void sendACK() throws IOException, InterruptedException{
+        byte[] ack = Utils.marshal(Constants.ACK_CHAR);
+        this.send(ack);
+    }
+
+    public byte[] sendAndReceive(byte[] packageByte) throws IOException, InterruptedException{
+        byte[] response = new byte[0];
+        do{
+            try{
+                this.send(packageByte);
+                response = this.receive();
+                break;
+            } catch(SocketTimeoutException e){
+                System.out.println(Constants.TIMEOUT_MSG);
+                continue;
+            }
+        } while(this.getSemInvo() >= Constants.AT_LEAST_ONE_SEM_INVO);
+
+        if(this.getSemInvo() >= Constants.AT_LEAST_ONE_SEM_INVO){
+            this.sendACK();
+        }
+        return response;
     }
 
     public static void main(String args[]){
@@ -78,34 +137,54 @@ class UDPClient
                 switch(serviceType){
                     case Constants.SERVICE_OPEN_ACCOUNT:
                         packageByte = HandleOpenAccount.createMessage(scanner);
-                        if (packageByte.length != 0){
-                            udpClient.send(packageByte);
-                            byte[] response = udpClient.receive();
-                            HandleOpenAccount.handleResponse(response);
+                        if (packageByte.length > 0){
+                            byte[] response = udpClient.sendAndReceive(packageByte);
+                            try{
+                                HandleOpenAccount.handleResponse(response);
+                            } catch (Exception e){
+                                System.out.println(Constants.SEPARATOR);
+                                System.out.printf(Constants.ERR_MSG, e.getMessage());
+                                System.out.println(Constants.SEPARATOR);
+                            }
                         }
                         break;
                     case Constants.SERVICE_CLOSE_ACCOUNT:
                         packageByte = HandleCloseAccount.createMessage(scanner);
                         if (packageByte.length != 0){
-                            udpClient.send(packageByte);
-                            byte[] response = udpClient.receive();
-                            HandleCloseAccount.handleResponse(response);
+                            byte[] response = udpClient.sendAndReceive(packageByte);
+                            try{
+                                HandleCloseAccount.handleResponse(response);
+                            } catch (Exception e){
+                                System.out.println(Constants.SEPARATOR);
+                                System.out.printf(Constants.ERR_MSG, e.getMessage());
+                                System.out.println(Constants.SEPARATOR);
+                            }
                         }
                         break;
                     case Constants.SERVICE_DEPOSIT_MONEY:
                         packageByte = HandleDepositMoney.createMessage(scanner);
                         if (packageByte.length != 0){
-                            udpClient.send(packageByte);
-                            byte[] response = udpClient.receive();
-                            HandleDepositMoney.handleResponse(response);
+                            byte[] response = udpClient.sendAndReceive(packageByte);
+                            try{
+                                HandleDepositMoney.handleResponse(response);
+                            } catch (Exception e){
+                                System.out.println(Constants.SEPARATOR);
+                                System.out.printf(Constants.ERR_MSG, e.getMessage());
+                                System.out.println(Constants.SEPARATOR);
+                            }
                         }
                         break;
                     case Constants.SERVICE_WITHDRAW_MONEY:
                         packageByte = HandleWithdrawMoney.createMessage(scanner);
                         if (packageByte.length != 0){
-                            udpClient.send(packageByte);
-                            byte[] response = udpClient.receive();
-                            HandleWithdrawMoney.handleResponse(response);
+                            byte[] response = udpClient.sendAndReceive(packageByte);
+                            try{
+                                HandleWithdrawMoney.handleResponse(response);
+                            } catch (Exception e){
+                                System.out.println(Constants.SEPARATOR);
+                                System.out.printf(Constants.ERR_MSG, e.getMessage());
+                                System.out.println(Constants.SEPARATOR);
+                            }
                         }
                         break;
                     case Constants.SERVICE_MONITOR_UPDATE:
@@ -114,17 +193,27 @@ class UDPClient
                     case Constants.SERVICE_TRANSFER_MONEY:
                         packageByte = HandleTransferMoney.createMessage(scanner);
                         if (packageByte.length != 0){
-                            udpClient.send(packageByte);
-                            byte[] response = udpClient.receive();
-                            HandleTransferMoney.handleResponse(response);
+                            byte[] response = udpClient.sendAndReceive(packageByte);
+                            try{
+                                HandleTransferMoney.handleResponse(response);
+                            } catch (Exception e){
+                                System.out.println(Constants.SEPARATOR);
+                                System.out.printf(Constants.ERR_MSG, e.getMessage());
+                                System.out.println(Constants.SEPARATOR);
+                            }
                         }
                         break;
                     case Constants.SERVICE_CHANGE_PASSWORD:
                         packageByte = HandleChangePassword.createMessage(scanner);
                         if (packageByte.length != 0){
-                            udpClient.send(packageByte);
-                            byte[] response = udpClient.receive();
-                            HandleChangePassword.handleResponse(response);
+                            byte[] response = udpClient.sendAndReceive(packageByte);
+                            try{
+                                HandleChangePassword.handleResponse(response);
+                            } catch (Exception e){
+                                System.out.println(Constants.SEPARATOR);
+                                System.out.printf(Constants.ERR_MSG, e.getMessage());
+                                System.out.println(Constants.SEPARATOR);
+                            }
                         }
                         break;
                     case Constants.SERVICE_EXIT:
@@ -137,7 +226,10 @@ class UDPClient
                 System.out.println(Constants.SEPARATOR);
             }
         }
-        catch(IOException e){}
-        catch(InterruptedException e){}
+        catch(Exception e){
+            System.out.println(Constants.SEPARATOR);
+            System.out.printf(Constants.ERR_MSG, e.getMessage());
+            System.out.println(Constants.SEPARATOR);
+        }
     }
 }
