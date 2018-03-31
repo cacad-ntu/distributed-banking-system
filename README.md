@@ -4,10 +4,19 @@ CZ4013 - Distributed System Assignment
 # How to compile
 
 ## Client (Java)
+
+### Windows
 ```
 cd client
 javac -d . -cp .;lib\* *.java
 java -cp .;lib\* client.UDPClient -h <HOST NAME> -p <PORT> [-al] [-am] [-fr <FAILURE RATE>] [-to <TIMEOUT>] [-mt <MAX TIMEOUT COUNT>]
+```
+
+### Linux
+```
+cd client
+javac -d . -cp .:lib/* *.java
+java -cp .:lib/* client.UDPClient -h <HOST NAME> -p <PORT> [-al] [-am] [-fr <FAILURE RATE>] [-to <TIMEOUT>] [-mt <MAX TIMEOUT COUNT>]
 ```
 
 ## Server (C++)
