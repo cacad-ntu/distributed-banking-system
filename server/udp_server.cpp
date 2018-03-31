@@ -16,6 +16,10 @@ void udp_server::send(const char *buf, size_t bufsize){
     sendto(sockfd, buf, bufsize, 0, (struct sockaddr *) &clientaddr, clientlen);
 }
 
+void udp_server::send(const char *buf, size_t bufsize, struct sockaddr_in addr, unsigned len){
+    sendto(sockfd, buf, bufsize, 0, (struct sockaddr *) &addr, len);
+}
+
 udp_server::udp_server(int port){
     portno = port;
     sockfd = socket(AF_INET, SOCK_DGRAM, 0);
@@ -37,4 +41,12 @@ udp_server::udp_server(int port){
         perror("ERROR on binding");
 
     clientlen = sizeof(clientaddr);
+}
+
+struct sockaddr_in udp_server::getClientAddress(){
+    return clientaddr;
+}
+
+unsigned udp_server::getClientLength(){
+    return clientlen;
 }

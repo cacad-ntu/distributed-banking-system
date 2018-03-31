@@ -6,19 +6,28 @@
 #include "utils.h"
 #include "AccountManager.h"
 #include "constants.h"
+#include <chrono>
+#include <deque>
+#include <map>
+#include "Admin.h"
 using namespace std;
 
 class Handler{
  private:
+    deque<Admin> admins;
     AccountManager acManager;
+    map<pair<unsigned long,int>,char*> memo;
+    int response_id;
  public:
-    void service1(udp_server &server, char *p);
-    void service2(udp_server &server, char *p);
-    void service3(udp_server &server, char *p);
-    void service4(udp_server &server, char *p);
-    void service5(udp_server &server, char *p);
-    void service6(udp_server &server, char *p);
-    void service7(udp_server &server, char *p);
+    int getResponseID();
+    void notify(udp_server &server, string s);
+    void service1(udp_server &server, char *p, int req_id, bool at_most_one);
+    void service2(udp_server &server, char *p, int req_id, bool at_most_one);
+    void service3(udp_server &server, char *p, int req_id, bool at_most_one);
+    void service4(udp_server &server, char *p, int req_id, bool at_most_one);
+    void service5(udp_server &server, char *p, int req_id, bool at_most_one);
+    void service6(udp_server &server, char *p, int req_id, bool at_most_one);
+    void service7(udp_server &server, char *p, int req_id, bool at_most_one);
 
     Handler();
 };
