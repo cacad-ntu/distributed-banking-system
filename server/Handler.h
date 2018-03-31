@@ -8,6 +8,7 @@
 #include "constants.h"
 #include <chrono>
 #include <deque>
+#include <map>
 #include "Admin.h"
 using namespace std;
 
@@ -15,15 +16,16 @@ class Handler{
  private:
     deque<Admin> admins;
     AccountManager acManager;
+    map<pair<unsigned long,int>,char*> memo;
  public:
     void notify(udp_server &server, string s);
-    void service1(udp_server &server, char *p);
-    void service2(udp_server &server, char *p);
-    void service3(udp_server &server, char *p);
-    void service4(udp_server &server, char *p);
-    void service5(udp_server &server, char *p);
-    void service6(udp_server &server, char *p);
-    void service7(udp_server &server, char *p);
+    void service1(udp_server &server, char *p, int req_id);
+    void service2(udp_server &server, char *p, int req_id);
+    void service3(udp_server &server, char *p, int req_id);
+    void service4(udp_server &server, char *p, int req_id);
+    void service5(udp_server &server, char *p, int req_id);
+    void service6(udp_server &server, char *p, int req_id);
+    void service7(udp_server &server, char *p, int req_id);
 
     Handler();
 };

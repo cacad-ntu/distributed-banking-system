@@ -28,31 +28,34 @@ void receive(udp_server &server){
     server.receive(buffer,message_length);
     
     char *cur = buffer;
-    int type = utils::unmarshalInt(cur);
+
+    int req_id = utils::unmarshalInt(cur);
+    cur+=4;
     
+    int type = utils::unmarshalInt(cur);
     cur+=4;
 
     switch(type){
     case 1:
-        handler.service1(server,cur);
+        handler.service1(server,cur,req_id);
         break;
     case 2:
-        handler.service2(server,cur);
+        handler.service2(server,cur,req_id);
         break;
     case 3:
-        handler.service3(server,cur);
+        handler.service3(server,cur,req_id);
         break;
     case 4:
-        handler.service4(server,cur);
+        handler.service4(server,cur,req_id);
         break;
     case 5:
-        handler.service5(server,cur);
+        handler.service5(server,cur,req_id);
         break;
     case 6:
-        handler.service6(server,cur);
+        handler.service6(server,cur,req_id);
         break;
     case 7:
-        handler.service7(server,cur);
+        handler.service7(server,cur,req_id);
         break;
     }
 }

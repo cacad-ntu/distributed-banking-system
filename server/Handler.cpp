@@ -28,7 +28,19 @@ void Handler::notify(udp_server &server, string s){
     }
 }
 
-void Handler::service1(udp_server &server, char *p){
+void Handler::service1(udp_server &server, char *p, int req_id){
+    unsigned long cAddress = server.getClientAddress().sin_addr.s_addr;
+
+    if(memo.count({cAddress,req_id})){
+        char header[HEADER_SIZE];
+        char *response = memo[{cAddress,req_id}];
+        
+        utils::marshalInt(sizeof(response),header);
+        server.send(header,HEADER_SIZE);
+        server.send(response,sizeof(response));
+        return; 
+    }
+    
     int currency;
     float balance;
     string passw, name;
@@ -65,6 +77,8 @@ void Handler::service1(udp_server &server, char *p){
     utils::marshalInt(4,cur);
     cur += 4;
     utils::marshalInt(accountNum,cur);
+
+    memo[{cAddress,req_id}] = response;
     
     server.send(header,HEADER_SIZE);
     server.send(response,9);
@@ -72,7 +86,19 @@ void Handler::service1(udp_server &server, char *p){
     notify(server,"Opened a new account with name " + name + ", currency " + to_string(currency) + ", balance " + to_string(balance) + ".");
 }
 
-void Handler::service2(udp_server &server, char *p){
+void Handler::service2(udp_server &server, char *p, int req_id){
+    unsigned long cAddress = server.getClientAddress().sin_addr.s_addr;
+
+    if(memo.count({cAddress,req_id})){
+        char header[HEADER_SIZE];
+        char *response = memo[{cAddress,req_id}];
+        
+        utils::marshalInt(sizeof(response),header);
+        server.send(header,HEADER_SIZE);
+        server.send(response,sizeof(response));
+        return; 
+    }
+    
     int accountNum;
     string passw, name;
 
@@ -103,6 +129,8 @@ void Handler::service2(udp_server &server, char *p){
         utils::marshalInt(1,header);
         utils::marshalString(ACK_SUCCESS,cur);
 
+        memo[{cAddress,req_id}] = response;
+
         server.send(header,HEADER_SIZE);
         server.send(response,1);
 
@@ -126,6 +154,8 @@ void Handler::service2(udp_server &server, char *p){
 
         utils::marshalString(err,cur);
 
+        memo[{cAddress,req_id}] = response;
+
         cout << "sending\n";
 
         server.send(header,HEADER_SIZE);
@@ -138,7 +168,19 @@ void Handler::service2(udp_server &server, char *p){
     }
 }
 
-void Handler::service3(udp_server &server, char *p){
+void Handler::service3(udp_server &server, char *p, int req_id){
+    unsigned long cAddress = server.getClientAddress().sin_addr.s_addr;
+
+    if(memo.count({cAddress,req_id})){
+        char header[HEADER_SIZE];
+        char *response = memo[{cAddress,req_id}];
+        
+        utils::marshalInt(sizeof(response),header);
+        server.send(header,HEADER_SIZE);
+        server.send(response,sizeof(response));
+        return; 
+    }
+    
     int accountNum, currency;
     float amount;
     string passw, name;
@@ -194,6 +236,8 @@ void Handler::service3(udp_server &server, char *p){
         utils::marshalString(err,cur);
         cur += (int)err.size();
 
+        memo[{cAddress,req_id}] = response;
+
         server.send(header,HEADER_SIZE);
         server.send(response,1+4+(int)err.size());
     }
@@ -216,6 +260,9 @@ void Handler::service3(udp_server &server, char *p){
         utils::marshalFloat(balance.second,cur);
 
         utils::marshalInt(17,header);
+
+        memo[{cAddress,req_id}] = response;
+        
         server.send(header,HEADER_SIZE);
         server.send(response,17);
 
@@ -223,7 +270,19 @@ void Handler::service3(udp_server &server, char *p){
     }
 }
 
-void Handler::service4(udp_server &server, char *p){
+void Handler::service4(udp_server &server, char *p, int req_id){
+    unsigned long cAddress = server.getClientAddress().sin_addr.s_addr;
+
+    if(memo.count({cAddress,req_id})){
+        char header[HEADER_SIZE];
+        char *response = memo[{cAddress,req_id}];
+        
+        utils::marshalInt(sizeof(response),header);
+        server.send(header,HEADER_SIZE);
+        server.send(response,sizeof(response));
+        return; 
+    }
+    
     int accountNum, currency;
     float amount;
     string passw, name;
@@ -280,6 +339,8 @@ void Handler::service4(udp_server &server, char *p){
         utils::marshalString(err,cur);
         cur += (int)err.size();
 
+        memo[{cAddress,req_id}] = response;
+
         server.send(header,HEADER_SIZE);
         server.send(response,1+4+(int)err.size());
     }
@@ -302,6 +363,9 @@ void Handler::service4(udp_server &server, char *p){
         utils::marshalFloat(balance.second,cur);
 
         utils::marshalInt(17,header);
+
+        memo[{cAddress,req_id}] = response;
+        
         server.send(header,HEADER_SIZE);
         server.send(response,17);
 
@@ -309,7 +373,8 @@ void Handler::service4(udp_server &server, char *p){
     }
 }
 
-void Handler::service5(udp_server &server, char *p){
+void Handler::service5(udp_server &server, char *p, int req_id){
+    unsigned long cAddress = server.getClientAddress().sin_addr.s_addr;
 
     /*
       ### Service 5 - Monitor updates to all updates made to all bank account
@@ -337,7 +402,19 @@ void Handler::service5(udp_server &server, char *p){
     admins.push_back(Admin(clientAddress, clientLength, start, interval));
 }
 
-void Handler::service6(udp_server &server, char *p){
+void Handler::service6(udp_server &server, char *p, int req_id){
+    unsigned long cAddress = server.getClientAddress().sin_addr.s_addr;
+
+    if(memo.count({cAddress,req_id})){
+        char header[HEADER_SIZE];
+        char *response = memo[{cAddress,req_id}];
+        
+        utils::marshalInt(sizeof(response),header);
+        server.send(header,HEADER_SIZE);
+        server.send(response,sizeof(response));
+        return; 
+    }
+    
     int accountNum1, accountNum2, currency;
     float amount;
     string passw, name1, name2;
@@ -414,6 +491,8 @@ void Handler::service6(udp_server &server, char *p){
         utils::marshalString(err,cur);
         cur += (int)err.size();
 
+        memo[{cAddress,req_id}] = response;
+
         server.send(header,HEADER_SIZE);
         server.send(response,1+4+(int)err.size());
     }
@@ -436,6 +515,8 @@ void Handler::service6(udp_server &server, char *p){
         utils::marshalFloat(balance.second,cur);
 
         utils::marshalInt(17,header);
+
+        memo[{cAddress,req_id}] = response;
     
         server.send(header,HEADER_SIZE);
         server.send(response,17);
@@ -444,7 +525,19 @@ void Handler::service6(udp_server &server, char *p){
     }
 }
 
-void Handler::service7(udp_server &server, char *p){
+void Handler::service7(udp_server &server, char *p, int req_id){
+    unsigned long cAddress = server.getClientAddress().sin_addr.s_addr;
+
+    if(memo.count({cAddress,req_id})){
+        char header[HEADER_SIZE];
+        char *response = memo[{cAddress,req_id}];
+        
+        utils::marshalInt(sizeof(response),header);
+        server.send(header,HEADER_SIZE);
+        server.send(response,sizeof(response));
+        return; 
+    }
+    
     int accountNum;
     string passw, newPassw, name;
 
@@ -477,6 +570,8 @@ void Handler::service7(udp_server &server, char *p){
     char *cur = response;
     if(success) utils::marshalString(ACK_SUCCESS,cur);
     else utils::marshalString(ACK_FAIL,cur);
+
+    memo[{cAddress,req_id}] = response;
     
     server.send(header,HEADER_SIZE);
     server.send(response,1);
