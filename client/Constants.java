@@ -3,9 +3,18 @@ package client;
 class Constants{
     // Connection Constant
     public static final int ACK = 1;
+    public static final String ACK_CHAR = "1";
     public static final int NAK = 0;
+    public static final String NAK_CHAR = "0";
+    public static final double FAILURE_RATE = 1.0;
     public static final int RESPONSE_TYPE_SIZE = 1;
+    public static final int TIMEOUT = 1000;
     public static final String INVALID_RESPONSE = "Sorry we are having problem in the server";
+    public static final String TIMEOUT_MSG = "Timeout!, resending request ...";
+
+    public static final int NO_SEM_INVO = 0;
+    public static final int AT_LEAST_ONE_SEM_INVO = 1;
+    public static final int AT_MOST_ONE_SEM_INVO = 2;
 
     // Type Constant
     public static final int INT_SIZE = 4;
@@ -50,8 +59,6 @@ class Constants{
     public static final String EXIT_SVC_MSG = "8. Exit.";
     public static final String CHOICE_SVC_MSG = "Your choice: ";
     public static final String UNRECOGNIZE_SVC_MSG = "Sorry we cannot recognize your service choice!";
-
-
 
     // Open Account UI Constant
     public static final String OPEN_MSG = "Opening new account!";

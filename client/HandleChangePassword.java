@@ -5,7 +5,7 @@ import java.lang.*;
 import java.util.*;
 
 class HandleChangePassword{
-    public static byte[] createMessage(Scanner scanner)throws UnsupportedEncodingException{
+    public static byte[] createMessage(Scanner scanner, int id)throws UnsupportedEncodingException{
         System.out.println(Constants.SEPARATOR);
         System.out.println(Constants.CHANGE_MSG);
 
@@ -50,7 +50,7 @@ class HandleChangePassword{
         System.out.println();
 
         if (confirm){
-            return HandleChangePassword.constructMessage(name, accNum, password, newPassword);
+            return HandleChangePassword.constructMessage(name, accNum, password, newPassword, id);
         }
         return new byte[0];
     }
@@ -73,10 +73,11 @@ class HandleChangePassword{
         }
     }
 
-    public static byte[] constructMessage(String name, int accountNumber, String password, String newPassword)throws UnsupportedEncodingException{
+    public static byte[] constructMessage(String name, int accountNumber, String password, String newPassword, int id)throws UnsupportedEncodingException{
         List message = new ArrayList();
 
-        Utils.appendType(message, Constants.SERVICE_CHANGE_PASSWORD);
+        Utils.append(message, id);
+        Utils.append(message, Constants.SERVICE_CHANGE_PASSWORD);
         Utils.appendMessage(message, name);
         Utils.appendMessage(message, accountNumber);
         Utils.appendMessage(message, password);

@@ -126,11 +126,28 @@ class Utils{
         )));
     }
 
-    public static void appendType(List list, int serviceType)throws UnsupportedEncodingException{
+    public static void append(List list, String s)throws UnsupportedEncodingException{
         list.addAll(Arrays.asList(Utils.byteBoxing(Utils.marshal(
-            serviceType
+            s
         ))));
     }
 
+    public static void append(List list, int x)throws UnsupportedEncodingException{
+        list.addAll(Arrays.asList(Utils.byteBoxing(Utils.marshal(
+            x
+        ))));
+    }
+
+    public static void append(List list, float f)throws UnsupportedEncodingException{
+        list.addAll(Arrays.asList(Utils.byteBoxing(Utils.marshal(
+            f
+        ))));
+    }
+
+    public static void append(List list, byte[] b)throws UnsupportedEncodingException{
+        list.addAll(Arrays.asList(Utils.byteBoxing(
+            b
+        )));
+    }
 
 }

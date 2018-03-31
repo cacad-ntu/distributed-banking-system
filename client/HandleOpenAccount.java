@@ -7,7 +7,7 @@ import java.util.*;
 
 class HandleOpenAccount{
 
-    public static byte[] createMessage(Scanner scanner)throws UnsupportedEncodingException{
+    public static byte[] createMessage(Scanner scanner, int id)throws UnsupportedEncodingException{
         System.out.println(Constants.SEPARATOR);
         System.out.println(Constants.OPEN_MSG);
 
@@ -52,7 +52,7 @@ class HandleOpenAccount{
         System.out.println();
 
         if (confirm){
-            return HandleOpenAccount.constructMessage(name, password, currency, balance);
+            return HandleOpenAccount.constructMessage(name, password, currency, balance, id);
         }
 
         return new byte[0];
@@ -76,10 +76,11 @@ class HandleOpenAccount{
         }
     }
 
-    public static byte[] constructMessage(String name, String password, int currency, float balance)throws UnsupportedEncodingException{
+    public static byte[] constructMessage(String name, String password, int currency, float balance, int id)throws UnsupportedEncodingException{
         List message = new ArrayList();
 
-        Utils.appendType(message, Constants.SERVICE_OPEN_ACCOUNT);
+        Utils.append(message, id);
+        Utils.append(message, Constants.SERVICE_OPEN_ACCOUNT);
         Utils.appendMessage(message, name);
         Utils.appendMessage(message, password);
         Utils.appendMessage(message, currency);

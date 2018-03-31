@@ -5,7 +5,7 @@ import java.lang.*;
 import java.util.*;
 
 class HandleTransferMoney{
-    public static byte[] createMessage(Scanner scanner)throws UnsupportedEncodingException{
+    public static byte[] createMessage(Scanner scanner, int id)throws UnsupportedEncodingException{
         System.out.println(Constants.SEPARATOR);
         System.out.println(Constants.TRANSFER_MSG);
 
@@ -72,7 +72,7 @@ class HandleTransferMoney{
         System.out.println();
 
         if (confirm){
-            return HandleTransferMoney.constructMessage(name, accNum, recipientName, recAccNum, password, currency, balance);
+            return HandleTransferMoney.constructMessage(name, accNum, recipientName, recAccNum, password, currency, balance, id);
         }
 
         return new byte[0];
@@ -99,10 +99,11 @@ class HandleTransferMoney{
         }
     }
 
-    public static byte[] constructMessage(String name, int accountNumber, String recipientName, int recipientAccountNumber, String password, int currency, float balance)throws UnsupportedEncodingException{
+    public static byte[] constructMessage(String name, int accountNumber, String recipientName, int recipientAccountNumber, String password, int currency, float balance, int id)throws UnsupportedEncodingException{
         List message = new ArrayList();
 
-        Utils.appendType(message, Constants.SERVICE_TRANSFER_MONEY);
+        Utils.append(message, id);
+        Utils.append(message, Constants.SERVICE_TRANSFER_MONEY);
         Utils.appendMessage(message, name);
         Utils.appendMessage(message, accountNumber);
         Utils.appendMessage(message, recipientName);

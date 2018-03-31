@@ -5,7 +5,7 @@ import java.lang.*;
 import java.util.*;
 
 class HandleCloseAccount{
-    public static byte[] createMessage(Scanner scanner)throws UnsupportedEncodingException{
+    public static byte[] createMessage(Scanner scanner, int id)throws UnsupportedEncodingException{
         System.out.println(Constants.SEPARATOR);
         System.out.println(Constants.CLOSE_MSG);
 
@@ -40,7 +40,7 @@ class HandleCloseAccount{
         System.out.println();
 
         if (confirm){
-            return HandleCloseAccount.constructMessage(name, accNum, password);
+            return HandleCloseAccount.constructMessage(name, accNum, password, id);
         }
         return new byte[0];
     }
@@ -62,10 +62,11 @@ class HandleCloseAccount{
         }
     }
 
-    public static byte[] constructMessage(String name, int accountNumber, String password)throws UnsupportedEncodingException{
+    public static byte[] constructMessage(String name, int accountNumber, String password, int id)throws UnsupportedEncodingException{
         List message = new ArrayList();
 
-        Utils.appendType(message, Constants.SERVICE_CLOSE_ACCOUNT);
+        Utils.append(message, id);
+        Utils.append(message, Constants.SERVICE_CLOSE_ACCOUNT);
         Utils.appendMessage(message, name);
         Utils.appendMessage(message, accountNumber);
         Utils.appendMessage(message, password);

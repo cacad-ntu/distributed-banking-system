@@ -71,18 +71,27 @@ class UDPClient
             receivePacket = new DatagramPacket(receiveData, receiveData.length);
             this.clientSocket.receive(receivePacket);
             responseID = Utils.unmarshalInteger(receivePacket.getData(), 0);
-        } while (handledResponse.containsKey(responseID));
 
-        handledResponse.put(responseID, true);
+            if (this.handledResponse.containsKey(responseID)){
+                this.sendACK(responseID);
+            }else{
+                break;
+            }
+        } while(true);
+
+        this.handledResponse.put(responseID, true);
         return Arrays.copyOfRange(receivePacket.getData(), Constants.INT_SIZE, messageLength);
     }
 
-    public void sendACK() throws IOException, InterruptedException{
-        byte[] ack = Utils.marshal(Constants.ACK_CHAR);
-        this.send(ack);
+    public void sendACK(int curID) throws IOException, InterruptedException{
+        List message = new ArrayList();
+        Utils.append(message, Constants.ACK_CHAR);
+        Utils.append(message, curID);
+
+        this.send(Utils.byteUnboxing(message));
     }
 
-    public byte[] sendAndReceive(byte[] packageByte) throws IOException, InterruptedException{
+    public byte[] sendAndReceive(byte[] packageByte, int curID) throws IOException, InterruptedException{
         byte[] response = new byte[0];
         do{
             try{
@@ -96,7 +105,7 @@ class UDPClient
         } while(this.getSemInvo() >= Constants.AT_LEAST_ONE_SEM_INVO);
 
         if(this.getSemInvo() >= Constants.AT_LEAST_ONE_SEM_INVO){
-            this.sendACK();
+            this.sendACK(curID);
         }
         return response;
     }
@@ -134,11 +143,12 @@ class UDPClient
                 System.out.println();
 
                 byte[] packageByte;
+                int curID = udpClient.getID();
                 switch(serviceType){
                     case Constants.SERVICE_OPEN_ACCOUNT:
-                        packageByte = HandleOpenAccount.createMessage(scanner);
+                        packageByte = HandleOpenAccount.createMessage(scanner, curID);
                         if (packageByte.length > 0){
-                            byte[] response = udpClient.sendAndReceive(packageByte);
+                            byte[] response = udpClient.sendAndReceive(packageByte, curID);
                             try{
                                 HandleOpenAccount.handleResponse(response);
                             } catch (Exception e){
@@ -149,9 +159,9 @@ class UDPClient
                         }
                         break;
                     case Constants.SERVICE_CLOSE_ACCOUNT:
-                        packageByte = HandleCloseAccount.createMessage(scanner);
+                        packageByte = HandleCloseAccount.createMessage(scanner, curID);
                         if (packageByte.length != 0){
-                            byte[] response = udpClient.sendAndReceive(packageByte);
+                            byte[] response = udpClient.sendAndReceive(packageByte, curID);
                             try{
                                 HandleCloseAccount.handleResponse(response);
                             } catch (Exception e){
@@ -162,9 +172,9 @@ class UDPClient
                         }
                         break;
                     case Constants.SERVICE_DEPOSIT_MONEY:
-                        packageByte = HandleDepositMoney.createMessage(scanner);
+                        packageByte = HandleDepositMoney.createMessage(scanner, curID);
                         if (packageByte.length != 0){
-                            byte[] response = udpClient.sendAndReceive(packageByte);
+                            byte[] response = udpClient.sendAndReceive(packageByte, curID);
                             try{
                                 HandleDepositMoney.handleResponse(response);
                             } catch (Exception e){
@@ -175,9 +185,9 @@ class UDPClient
                         }
                         break;
                     case Constants.SERVICE_WITHDRAW_MONEY:
-                        packageByte = HandleWithdrawMoney.createMessage(scanner);
+                        packageByte = HandleWithdrawMoney.createMessage(scanner, curID);
                         if (packageByte.length != 0){
-                            byte[] response = udpClient.sendAndReceive(packageByte);
+                            byte[] response = udpClient.sendAndReceive(packageByte, curID);
                             try{
                                 HandleWithdrawMoney.handleResponse(response);
                             } catch (Exception e){
@@ -191,9 +201,9 @@ class UDPClient
                         System.out.printf("Service %s, comming soon\n", message);
                         break;
                     case Constants.SERVICE_TRANSFER_MONEY:
-                        packageByte = HandleTransferMoney.createMessage(scanner);
+                        packageByte = HandleTransferMoney.createMessage(scanner, curID);
                         if (packageByte.length != 0){
-                            byte[] response = udpClient.sendAndReceive(packageByte);
+                            byte[] response = udpClient.sendAndReceive(packageByte, curID);
                             try{
                                 HandleTransferMoney.handleResponse(response);
                             } catch (Exception e){
@@ -204,9 +214,9 @@ class UDPClient
                         }
                         break;
                     case Constants.SERVICE_CHANGE_PASSWORD:
-                        packageByte = HandleChangePassword.createMessage(scanner);
+                        packageByte = HandleChangePassword.createMessage(scanner, curID);
                         if (packageByte.length != 0){
-                            byte[] response = udpClient.sendAndReceive(packageByte);
+                            byte[] response = udpClient.sendAndReceive(packageByte, curID);
                             try{
                                 HandleChangePassword.handleResponse(response);
                             } catch (Exception e){
