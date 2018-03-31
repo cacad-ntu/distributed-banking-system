@@ -13,9 +13,9 @@ void Handler::notify(udp_server &server, string s, int status){
     if((int)admins.size() == 0) return;
     
     char header[HEADER_SIZE];
-    utils::marshalInt(4 + 4 + 4 + (int)s.size(), header);
+    utils::marshalInt(4 + 1 + 4 + 4 + (int)s.size(), header);
 
-    char *response = new char[4+4+4+(int)s.size()];
+    char *response = new char[4+1+4+4+(int)s.size()];
 
     while(admins.size() && !admins[0].isAvailable())
         admins.pop_front();
@@ -31,6 +31,9 @@ void Handler::notify(udp_server &server, string s, int status){
         utils::marshalInt(responseID,cur);
         cur += 4;
 
+        utils::marshalString(ACK_SUCCESS,cur);
+        cur += 1;
+
         char *rem = cur;
         utils::marshalInt(admin.getRemaining(),cur);
         cur += 4;
@@ -42,7 +45,7 @@ void Handler::notify(udp_server &server, string s, int status){
         cur += (int)s.size();
         
         server.send(header,HEADER_SIZE,admin.getAddress(),admin.getLength());
-        server.send(response,4 + 4+4+(int)s.size(),admin.getAddress(),admin.getLength());
+        server.send(response,4+1+4+4+(int)s.size(),admin.getAddress(),admin.getLength());
 
         if(status >= 1){
             while(admin.isAvailable()){
@@ -51,7 +54,7 @@ void Handler::notify(udp_server &server, string s, int status){
                     if(admin.isAvailable()){
                         utils::marshalInt(admin.getRemaining(),rem);
                         server.send(header,HEADER_SIZE);
-                        server.send(response,4+4+4+(int)s.size());
+                        server.send(response,4+1+4+4+(int)s.size());
                         continue;
                     }
                     else break;
@@ -62,7 +65,7 @@ void Handler::notify(udp_server &server, string s, int status){
                     if(admin.isAvailable()){
                         utils::marshalInt(admin.getRemaining(),rem);
                         server.send(header,HEADER_SIZE);
-                        server.send(response,4+4+4+(int)s.size());
+                        server.send(response,4+1+4+4+(int)s.size());
                         continue;
                     }
                     else break;
@@ -629,37 +632,41 @@ void Handler::service5(udp_server &server, char *p, int req_id, int status){
     auto clientLength  = server.getClientLength();
     auto start = std::chrono::high_resolution_clock::now();
 
-    admins.push_back(Admin(clientAddress, clientLength, start, interval));
+    Admin newAdmin(clientAddress, clientLength, start, interval);
+    admins.push_back(newAdmin);
 
     char header[HEADER_SIZE];
-    char response[4+1];
+    char response[4+1+4];
     char *cur = response;
-    utils::marshalInt(4+1,header);
+    utils::marshalInt(4+1+4,header);
 
     int responseID = getResponseID();
     utils::marshalInt(responseID,cur);
     cur += 4;
 
     utils::marshalString(ACK_SUCCESS,cur);
+    cur += 1;
+    
+    utils::marshalInt(newAdmin.getRemaining(),cur);
 
     if(status == 2) memo[{cAddress,req_id}] = response;
 
     server.send(header,HEADER_SIZE);
-    server.send(response,4+1);
+    server.send(response,4+1+4);
 
     if(status >= 1){
         while(1){
             int n = server.receive_time(header,HEADER_SIZE);
             if(n <= 0){
                 server.send(header,HEADER_SIZE);
-                server.send(response,4+1);
+                server.send(response,4+1+4);
                 continue;
             }
             char* ack = new char[1];
             n = server.receive_time(ack,1);
             if(n <= 0){
                 server.send(header,HEADER_SIZE);
-                server.send(response,4+1);
+                server.send(response,4+1+4);
                 continue;
             }
             char *x = ack;
