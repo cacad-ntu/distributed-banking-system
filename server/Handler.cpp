@@ -13,9 +13,9 @@ void Handler::notify(udp_server &server, string s, int status){
     if((int)admins.size() == 0) return;
     
     char header[HEADER_SIZE];
-    utils::marshalInt(4 + 4 + (int)s.size(), header);
+    utils::marshalInt(4 + 4 + 4 + (int)s.size(), header);
 
-    char *response = new char[4+4+(int)s.size()];
+    char *response = new char[4+4+4+(int)s.size()];
 
     while(admins.size() && !admins[0].isAvailable())
         admins.pop_front();
@@ -31,6 +31,10 @@ void Handler::notify(udp_server &server, string s, int status){
         utils::marshalInt(responseID,cur);
         cur += 4;
 
+        char *rem = cur;
+        utils::marshalInt(admin.getRemaining(),cur);
+        cur += 4;
+        
         utils::marshalInt((int)s.size(),cur);
         cur += 4;
     
@@ -38,22 +42,30 @@ void Handler::notify(udp_server &server, string s, int status){
         cur += (int)s.size();
         
         server.send(header,HEADER_SIZE,admin.getAddress(),admin.getLength());
-        server.send(response,4+4+(int)s.size(),admin.getAddress(),admin.getLength());
+        server.send(response,4 + 4+4+(int)s.size(),admin.getAddress(),admin.getLength());
 
         if(status >= 1){
-            while(1){
+            while(admin.isAvailable()){
                 int n = server.receive_time(header,HEADER_SIZE);
                 if(n <= 0){
-                    server.send(header,HEADER_SIZE);
-                    server.send(response,4+4+(int)s.size());
-                    continue;
+                    if(admin.isAvailable()){
+                        utils::marshalInt(admin.getRemaining(),rem);
+                        server.send(header,HEADER_SIZE);
+                        server.send(response,4+4+4+(int)s.size());
+                        continue;
+                    }
+                    else break;
                 }
                 char* ack = new char[1];
                 n = server.receive_time(ack,1);
                 if(n <= 0){
-                    server.send(header,HEADER_SIZE);
-                    server.send(response,4+4+(int)s.size());
-                    continue;
+                    if(admin.isAvailable()){
+                        utils::marshalInt(admin.getRemaining(),rem);
+                        server.send(header,HEADER_SIZE);
+                        server.send(response,4+4+4+(int)s.size());
+                        continue;
+                    }
+                    else break;
                 }
                 char *x = ack;
                 x += 1;

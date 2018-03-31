@@ -13,6 +13,10 @@ int Admin::getDuration(){
     return (int)(elapsed * 1000);
 }
 
+int Admin::getRemaining(){
+    return interval - getDuration();
+}
+
 bool Admin::isAvailable(){
     return getDuration() < interval;
 }

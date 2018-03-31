@@ -15,6 +15,8 @@ public:
     unsigned getLength();
     
     int getDuration();
+    int getRemaining();
+    
     bool isAvailable();
     Admin(struct sockaddr_in _address, unsigned _len, chrono::time_point<std::chrono::high_resolution_clock> _start, int _interval);
 };
