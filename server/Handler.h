@@ -20,14 +20,14 @@ class Handler{
     int response_id;
  public:
     int getResponseID();
-    void notify(udp_server &server, string s);
-    void service1(udp_server &server, char *p, int req_id, bool at_most_one);
-    void service2(udp_server &server, char *p, int req_id, bool at_most_one);
-    void service3(udp_server &server, char *p, int req_id, bool at_most_one);
-    void service4(udp_server &server, char *p, int req_id, bool at_most_one);
-    void service5(udp_server &server, char *p, int req_id, bool at_most_one);
-    void service6(udp_server &server, char *p, int req_id, bool at_most_one);
-    void service7(udp_server &server, char *p, int req_id, bool at_most_one);
+    void notify(udp_server &server, string s, int status);
+    void service1(udp_server &server, char *p, int req_id, int status);
+    void service2(udp_server &server, char *p, int req_id, int status);
+    void service3(udp_server &server, char *p, int req_id, int status);
+    void service4(udp_server &server, char *p, int req_id, int status);
+    void service5(udp_server &server, char *p, int req_id, int status);
+    void service6(udp_server &server, char *p, int req_id, int status);
+    void service7(udp_server &server, char *p, int req_id, int status);
 
     Handler();
 };
