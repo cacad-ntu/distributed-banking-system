@@ -101,7 +101,7 @@ class UDPClient
         } while(this.semInvo >= Constants.AT_MOST_ONE_SEM_INVO);
 
         if(this.getSemInvo() >= Constants.AT_LEAST_ONE_SEM_INVO){
-            this.sendACK(curID);
+            this.sendACK(responseID);
         }
 
         this.handledResponse.put(responseID, true);
