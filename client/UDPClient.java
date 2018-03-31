@@ -17,17 +17,18 @@ class UDPClient
     private int idCounter;
     private int semInvo;
     private int maxTimeout;
+    private int timeout;
     private Map<Integer, Boolean> handledResponse;
 
     public UDPClient(String ip, int port) throws SocketException, UnknownHostException{
         this.clientSocket = new DatagramSocket();
-        this.clientSocket.setSoTimeout(Constants.DEFAULT_NO_TIMEOUT);
+        this.setTimeout(Constants.DEFAULT_NO_TIMEOUT, Constants.DEFAULT_MAX_TIMEOUT);
+
         this.IPAddress = InetAddress.getByName(ip);
         this.port = port;
         this.failureRate = Constants.DEFAULT_FAILURE_RATE;
         this.idCounter = 0;
         this.semInvo = Constants.NO_SEM_INVO;
-        this.maxTimeout = Constants.DEFAULT_MAX_TIMEOUT;
         this.handledResponse = new HashMap<Integer, Boolean>();
     }
 
@@ -39,8 +40,14 @@ class UDPClient
         this.semInvo = semInvo;
     }
 
+    public void setTimeout(int timeout) throws SocketException{
+        clientSocket.setSoTimeout(timeout);
+        this.timeout = timeout;
+    }
+
     public void setTimeout(int timeout, int maxTimeout) throws SocketException{
         clientSocket.setSoTimeout(timeout);
+        this.timeout = timeout;
         this.maxTimeout = maxTimeout;
     }
 
@@ -51,6 +58,10 @@ class UDPClient
 
     public int getSemInvo(){
         return this.semInvo;
+    }
+
+    public int getTimeout(){
+        return this.timeout;
     }
 
     public void send(byte[] message) throws IOException, InterruptedException{
@@ -286,7 +297,29 @@ class UDPClient
                         }
                         break;
                     case Constants.SERVICE_MONITOR_UPDATE:
-                        System.out.printf("Service %s, comming soon\n", message);
+                        packageByte = HandleMonitorUpdate.createMessage(scanner, curID);
+                        if (packageByte.length != 0){
+                            int realTimeout = udpClient.getTimeout();
+                            try{
+                                System.out.println(Constants.SEPARATOR);
+                                byte[] response = udpClient.sendAndReceive(packageByte, curID);
+                                int remainingDuration = HandleMonitorUpdate.handleResponse(response);
+                                do{
+                                    udpClient.setTimeout(remainingDuration);
+                                    byte[] update = udpClient.receive();
+                                    remainingDuration = HandleMonitorUpdate.handleResponse(update);
+                                } while(true);
+                            } catch (SocketTimeoutException e){
+                                udpClient.setTimeout(realTimeout);
+                                System.out.println(Constants.MONITORING_FINISH_MSG);
+                                System.out.println();
+                                System.out.println(Constants.SEPARATOR);
+                            } catch (Exception e){
+                                udpClient.setTimeout(realTimeout);
+                                System.out.print(Constants.SEPARATOR);
+                                System.out.printf(Constants.ERR_MSG, e.getMessage());
+                            }
+                        }
                         break;
                     case Constants.SERVICE_TRANSFER_MONEY:
                         packageByte = HandleTransferMoney.createMessage(scanner, curID);

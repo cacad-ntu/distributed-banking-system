@@ -124,6 +124,13 @@ class Constants{
     public static final String TRANSFER_BALANCE_MSG = "Enter transfer balance (e.g. 1000.00): ";
     public static final String SUCCESSFUL_TRANSFER_MONEY = "You have successfully transferred money.\nYour new balance: %s %f\n";
 
+    // Monitor Update UI Constant
+    public static final String MONITOR_MSG = "Monitor update!";
+    public static final String MONITOR_DURATION_MSG = "Enter duration to monitor (ms): ";
+    public static final String MONITORING_START_MSG  = "Start monitoring!";
+    public static final String NEW_UPDATE = "[%s] UPDATE: %s\n";
+    public static final String MONITORING_FINISH_MSG = "Monitoring Update Finished";
+
     // Confirmation UI Constant
     public static final String CONFIRM_SUMMARY = "Summary:";
     public static final String CONFIRM_NAME = "Name: %s\n";
@@ -134,6 +141,7 @@ class Constants{
     public static final String CONFIRM_BALANCE = "Balance: %f\n";
     public static final String CONFIRM_ACCOUNT_NUMBER = "Account Number: %d\n";
     public static final String CONFIRM_REC_ACCOUNT_NUMBER = "Recipient Account Number: %d\n";
+    public static final String CONFIRM_DURATION = "Duration to monitor: %d\n";
     public static final String CONFIRM_MSG = "Are you sure? (Y/N) ";
     public static final String CONFIRM_YES = "Y";
     public static final String CONFIRM_NO = "N";
