@@ -4,6 +4,9 @@ import java.io.*;
 import java.net.*;
 import java.lang.*;
 import java.util.*;
+import java.util.concurrent.TimeoutException;
+
+import org.apache.commons.cli.*;
 
 class UDPClient
 {
@@ -13,16 +16,18 @@ class UDPClient
     private double failureRate;
     private int idCounter;
     private int semInvo;
+    private int maxTimeout;
     private Map<Integer, Boolean> handledResponse;
 
     public UDPClient(String ip, int port) throws SocketException, UnknownHostException{
         this.clientSocket = new DatagramSocket();
-        this.clientSocket.setSoTimeout(Constants.NO_TIMEOUT);
+        this.clientSocket.setSoTimeout(Constants.DEFAULT_NO_TIMEOUT);
         this.IPAddress = InetAddress.getByName(ip);
         this.port = port;
-        this.failureRate = Constants.FAILURE_RATE;
+        this.failureRate = Constants.DEFAULT_FAILURE_RATE;
         this.idCounter = 0;
         this.semInvo = Constants.NO_SEM_INVO;
+        this.maxTimeout = Constants.DEFAULT_MAX_TIMEOUT;
         this.handledResponse = new HashMap<Integer, Boolean>();
     }
 
@@ -32,6 +37,11 @@ class UDPClient
 
     public void setSemInvo(int semInvo){
         this.semInvo = semInvo;
+    }
+
+    public void setTimeout(int timeout, int maxTimeout) throws SocketException{
+        clientSocket.setSoTimeout(timeout);
+        this.maxTimeout = maxTimeout;
     }
 
     public int getID(){
@@ -44,7 +54,7 @@ class UDPClient
     }
 
     public void send(byte[] message) throws IOException, InterruptedException{
-        if (Math.random() > this.failureRate){
+        if (Math.random() < this.failureRate){
             return;
         }
 
@@ -72,12 +82,12 @@ class UDPClient
             this.clientSocket.receive(receivePacket);
             responseID = Utils.unmarshalInteger(receivePacket.getData(), 0);
 
-            if (this.handledResponse.containsKey(responseID)){
+            if (this.semInvo >= Constants.AT_LEAST_ONE_SEM_INVO && this.handledResponse.containsKey(responseID)){
                 this.sendACK(responseID);
             }else{
                 break;
             }
-        } while(true);
+        } while(this.semInvo >= Constants.AT_MOST_ONE_SEM_INVO);
 
         this.handledResponse.put(responseID, true);
         return Arrays.copyOfRange(receivePacket.getData(), Constants.INT_SIZE, messageLength);
@@ -91,15 +101,20 @@ class UDPClient
         this.send(Utils.byteUnboxing(message));
     }
 
-    public byte[] sendAndReceive(byte[] packageByte, int curID) throws IOException, InterruptedException{
+    public byte[] sendAndReceive(byte[] packageByte, int curID) throws IOException, InterruptedException, TimeoutException{
         byte[] response = new byte[0];
+        int timeoutCount = 0;
         do{
             try{
                 this.send(packageByte);
                 response = this.receive();
                 break;
             } catch(SocketTimeoutException e){
-                System.out.println(Constants.TIMEOUT_MSG);
+                timeoutCount++;
+                System.out.printf(Constants.TIMEOUT_MSG, timeoutCount, this.maxTimeout);
+                if (this.maxTimeout > 0 && timeoutCount >= this.maxTimeout){
+                    throw new TimeoutException(Constants.MAX_TIMEOUT_MSG);
+                }
                 continue;
             }
         } while(this.getSemInvo() >= Constants.AT_LEAST_ONE_SEM_INVO);
@@ -110,19 +125,95 @@ class UDPClient
         return response;
     }
 
-    public static void main(String args[]){
-        if(args.length < 2){
-            System.out.println("Usage: UDPClient <IP ADDRESS> <PORT>");
+    public static void main(String[] args){
+        Options options = new Options();
+
+        Option opHost = new Option("h", "host", true, "Server host");
+        opHost.setRequired(true);
+        options.addOption(opHost);
+
+        Option opPort = new Option("p", "port", true, "Server port");
+        opPort.setRequired(true);
+        opPort.setType(Integer.TYPE);
+        options.addOption(opPort);
+
+        Option opAtLeastOnce = new Option("al", "atleast", false, "Enable at least once invocation semantic");
+        options.addOption(opAtLeastOnce);
+
+        Option opAtMostOnce = new Option("am", "atmost", false, "Enable at most once invocation semantic");
+        options.addOption(opAtMostOnce);
+
+        Option opFailureRate = new Option("fr", "failurerate", true, "Set failure rate (float)");
+        opFailureRate.setType(Double.TYPE);
+        options.addOption(opFailureRate);
+
+        Option opTimeout = new Option("to", "timeout", true, "Set timeout in millisecond");
+        opTimeout.setType(Integer.TYPE);
+        options.addOption(opTimeout);
+
+        Option opTimeoutCount = new Option("mt", "maxtimeout", true, "Set timeout max count");
+        opTimeoutCount.setType(Integer.TYPE);
+        options.addOption(opTimeoutCount);
+
+        CommandLineParser parser = new DefaultParser();
+        HelpFormatter formatter = new HelpFormatter();
+        CommandLine cmd;
+
+        String host = Constants.DEFAULT_HOST;
+        int port = Constants.DEFAULT_PORT;
+        boolean atLeastOnce = false;
+        boolean atMostOnce = false;
+        double failureRate = Constants.DEFAULT_FAILURE_RATE;
+        int timeout = Constants.DEFAULT_NO_TIMEOUT;
+        int maxTimeout = Constants.DEFAULT_MAX_TIMEOUT;
+
+        try {
+            cmd = parser.parse(options, args);
+            System.out.println(cmd.getParsedOptionValue("failurerate"));
+            host = cmd.getOptionValue("host");
+            port = Integer.parseInt(cmd.getOptionValue("port"));
+            atLeastOnce = cmd.hasOption("atleast");
+            if (atLeastOnce){
+                timeout = Constants.DEFAULT_TIMEOUT;
+            }
+            atMostOnce = cmd.hasOption("atmost");
+            if (atMostOnce){
+                timeout = Constants.DEFAULT_TIMEOUT;
+            }
+            if (cmd.hasOption("failurerate")){
+                failureRate = Double.parseDouble(cmd.getOptionValue("failurerate"));
+            }
+            if (cmd.hasOption("timeout")){
+                timeout = Integer.parseInt(cmd.getOptionValue("timeout"));
+            }
+            if (cmd.hasOption("maxtimeout")){
+                maxTimeout = Integer.parseInt(cmd.getOptionValue("maxtimeout"));
+            }
+        } catch (ParseException e) {
+            System.out.println(e.getMessage());
+            formatter.printHelp("UDPClient", options);
+
+            System.exit(1);
             return;
         }
+
         try{
-            System.out.println(Constants.SEPARATOR);
+            System.out.print(Constants.SEPARATOR);
             System.out.println(Constants.WELCOME_MSG);
             System.out.println(Constants.SEPARATOR);
 
-            UDPClient udpClient = new UDPClient(args[0],Integer.parseInt(args[1]));
-            Scanner scanner = new Scanner(System.in);
+            UDPClient udpClient = new UDPClient(host, port);
+            if (atLeastOnce){
+                udpClient.setSemInvo(Constants.AT_LEAST_ONE_SEM_INVO);
+                udpClient.setTimeout(timeout, maxTimeout);
+            }
+            if (atMostOnce){
+                udpClient.setSemInvo(Constants.AT_MOST_ONE_SEM_INVO);
+                udpClient.setTimeout(timeout, maxTimeout);
+            }
+            udpClient.setFailureRate(failureRate);
 
+            Scanner scanner = new Scanner(System.in);
             boolean exit = false;
 
             while(!exit){
@@ -148,52 +239,49 @@ class UDPClient
                     case Constants.SERVICE_OPEN_ACCOUNT:
                         packageByte = HandleOpenAccount.createMessage(scanner, curID);
                         if (packageByte.length > 0){
-                            byte[] response = udpClient.sendAndReceive(packageByte, curID);
                             try{
+                                byte[] response = udpClient.sendAndReceive(packageByte, curID);
                                 HandleOpenAccount.handleResponse(response);
                             } catch (Exception e){
-                                System.out.println(Constants.SEPARATOR);
+                                System.out.print(Constants.SEPARATOR);
                                 System.out.printf(Constants.ERR_MSG, e.getMessage());
-                                System.out.println(Constants.SEPARATOR);
+
                             }
                         }
                         break;
                     case Constants.SERVICE_CLOSE_ACCOUNT:
                         packageByte = HandleCloseAccount.createMessage(scanner, curID);
                         if (packageByte.length != 0){
-                            byte[] response = udpClient.sendAndReceive(packageByte, curID);
                             try{
+                                byte[] response = udpClient.sendAndReceive(packageByte, curID);
                                 HandleCloseAccount.handleResponse(response);
                             } catch (Exception e){
-                                System.out.println(Constants.SEPARATOR);
+                                System.out.print(Constants.SEPARATOR);
                                 System.out.printf(Constants.ERR_MSG, e.getMessage());
-                                System.out.println(Constants.SEPARATOR);
                             }
                         }
                         break;
                     case Constants.SERVICE_DEPOSIT_MONEY:
                         packageByte = HandleDepositMoney.createMessage(scanner, curID);
                         if (packageByte.length != 0){
-                            byte[] response = udpClient.sendAndReceive(packageByte, curID);
                             try{
+                                byte[] response = udpClient.sendAndReceive(packageByte, curID);
                                 HandleDepositMoney.handleResponse(response);
                             } catch (Exception e){
-                                System.out.println(Constants.SEPARATOR);
+                                System.out.print(Constants.SEPARATOR);
                                 System.out.printf(Constants.ERR_MSG, e.getMessage());
-                                System.out.println(Constants.SEPARATOR);
                             }
                         }
                         break;
                     case Constants.SERVICE_WITHDRAW_MONEY:
                         packageByte = HandleWithdrawMoney.createMessage(scanner, curID);
                         if (packageByte.length != 0){
-                            byte[] response = udpClient.sendAndReceive(packageByte, curID);
                             try{
+                                byte[] response = udpClient.sendAndReceive(packageByte, curID);
                                 HandleWithdrawMoney.handleResponse(response);
                             } catch (Exception e){
-                                System.out.println(Constants.SEPARATOR);
+                                System.out.print(Constants.SEPARATOR);
                                 System.out.printf(Constants.ERR_MSG, e.getMessage());
-                                System.out.println(Constants.SEPARATOR);
                             }
                         }
                         break;
@@ -203,26 +291,24 @@ class UDPClient
                     case Constants.SERVICE_TRANSFER_MONEY:
                         packageByte = HandleTransferMoney.createMessage(scanner, curID);
                         if (packageByte.length != 0){
-                            byte[] response = udpClient.sendAndReceive(packageByte, curID);
                             try{
+                                byte[] response = udpClient.sendAndReceive(packageByte, curID);
                                 HandleTransferMoney.handleResponse(response);
                             } catch (Exception e){
-                                System.out.println(Constants.SEPARATOR);
+                                System.out.print(Constants.SEPARATOR);
                                 System.out.printf(Constants.ERR_MSG, e.getMessage());
-                                System.out.println(Constants.SEPARATOR);
                             }
                         }
                         break;
                     case Constants.SERVICE_CHANGE_PASSWORD:
                         packageByte = HandleChangePassword.createMessage(scanner, curID);
                         if (packageByte.length != 0){
-                            byte[] response = udpClient.sendAndReceive(packageByte, curID);
                             try{
+                                byte[] response = udpClient.sendAndReceive(packageByte, curID);
                                 HandleChangePassword.handleResponse(response);
                             } catch (Exception e){
-                                System.out.println(Constants.SEPARATOR);
+                                System.out.print(Constants.SEPARATOR);
                                 System.out.printf(Constants.ERR_MSG, e.getMessage());
-                                System.out.println(Constants.SEPARATOR);
                             }
                         }
                         break;
@@ -237,8 +323,9 @@ class UDPClient
             }
         }
         catch(Exception e){
-            System.out.println(Constants.SEPARATOR);
+            System.out.print(Constants.SEPARATOR);
             System.out.printf(Constants.ERR_MSG, e.getMessage());
+            System.out.println(Constants.EXIT_MSG);
             System.out.println(Constants.SEPARATOR);
         }
     }

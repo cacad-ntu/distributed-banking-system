@@ -6,8 +6,8 @@ CZ4013 - Distributed System Assignment
 ## Client (Java)
 ```
 cd client
-javac -d . *.java
-java client.UDPClient <IP address> <port>
+javac -d . -cp .;lib\* *.java
+java -cp .;lib\* client.UDPClient -h <HOST NAME> -p <PORT> [-al] [-am] [-fr <FAILURE RATE>] [-to <TIMEOUT>] [-mt <MAX TIMEOUT COUNT>]
 ```
 
 ## Server (C++)
