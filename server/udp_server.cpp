@@ -1,7 +1,7 @@
 #include "udp_server.h"
 
 int udp_server::receive_time(char *buf, size_t bufsize, int timeout_in_seconds){
-    bzero(buf, bufsize);
+    //bzero(buf, bufsize);
     tv.tv_sec = timeout_in_seconds;
     tv.tv_usec = 0;
     setsockopt(sockfd, SOL_SOCKET, SO_RCVTIMEO, (const char*)&tv, sizeof tv);
