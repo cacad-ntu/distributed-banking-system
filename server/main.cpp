@@ -32,8 +32,11 @@ void receive(udp_server &server){
     cout << "Msg length: " << message_length << '\n';
     
     buffer = new char[message_length];
-    n = server.receive_time(buffer,message_length,1);
 
+    cout << "Receiving message..\n";
+    n = server.receive_time(buffer,message_length,1);
+    cout << "Received.\n";
+    
     if(n <= 0){
         cout << "RETURNING\n";
         return;
