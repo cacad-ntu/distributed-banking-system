@@ -29,8 +29,7 @@ private:
     struct timeval tv;
     
 public:
-    int receive(char *buf, size_t bufsize);
-    int receive_time(char *buf, size_t bufsize);
+    int receive_time(char *buf, size_t bufsize, int timeout_in_seconds);
     void send(const char *buf, size_t bufsize);
     void send(const char *buf, size_t bufsize, struct sockaddr_in addr, unsigned len);
 

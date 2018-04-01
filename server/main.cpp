@@ -21,16 +21,23 @@ void send(udp_server &server){
 
 void receive(udp_server &server){
     cout << "WAITING\n";
-    int n = server.receive(header,HEADER_SIZE);
+    int n = server.receive_time(header,HEADER_SIZE,10000);
+
+    if(n <= 0){
+        cout << "RETURNING\n";
+        return;
+    }
     
     message_length = utils::unmarshalInt(header);
     cout << "Msg length: " << message_length << '\n';
     
     buffer = new char[message_length];
-    n = server.receive_time(buffer,message_length);
+    n = server.receive_time(buffer,message_length,1);
 
-    if(n <= 0) return;
-    
+    if(n <= 0){
+        cout << "RETURNING\n";
+        return;
+    }
     char *cur = buffer;
 
     int req_id = utils::unmarshalInt(cur);
