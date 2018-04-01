@@ -66,6 +66,7 @@ class UDPClient
 
     public void send(byte[] message) throws IOException, InterruptedException{
         if (Math.random() < this.failureRate){
+            System.out.println("SIMULATING SENDING FAILURE");
             return;
         }
 
@@ -94,7 +95,6 @@ class UDPClient
             responseID = Utils.unmarshalInteger(receivePacket.getData(), 0);
 
             System.out.printf("RECEIVE RESPONSE: %d\n", responseID);
-
             if (this.semInvo >= Constants.AT_LEAST_ONE_SEM_INVO && this.handledResponse.containsKey(responseID)){
                 this.sendACK(responseID);
             }else{
@@ -103,10 +103,9 @@ class UDPClient
         } while(this.semInvo >= Constants.AT_MOST_ONE_SEM_INVO);
 
         if(this.getSemInvo() >= Constants.AT_LEAST_ONE_SEM_INVO){
+            System.out.printf("SEND ACK: %d\n", responseID);
             this.sendACK(responseID);
         }
-
-        System.out.printf("SEND ACK: %d\n", responseID);
 
         this.handledResponse.put(responseID, true);
         return Arrays.copyOfRange(receivePacket.getData(), Constants.INT_SIZE, messageLength);
