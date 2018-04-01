@@ -19,6 +19,7 @@ class Handler{
     map<pair<unsigned long,int>,char*> memo;
     int response_id;
  public:
+    void ackHandler(udp_server &server, char *header, char *response, int responseSize, int responseID);
     int getResponseID();
     void notify(udp_server &server, string s, int status);
     void service1(udp_server &server, char *p, int req_id, int status);
