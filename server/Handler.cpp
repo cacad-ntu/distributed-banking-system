@@ -502,6 +502,7 @@ void Handler::service4(udp_server &server, char *p, int req_id, int status){
 }
 
 void Handler::service5(udp_server &server, char *p, int req_id, int status){
+    cout << "Beginning service 5\n";
     unsigned long cAddress = server.getClientAddress().sin_addr.s_addr;
 
     /*
@@ -523,17 +524,25 @@ void Handler::service5(udp_server &server, char *p, int req_id, int status){
     interval = utils::unmarshalInt(p);
     p += length;
 
+    cout << "Obtaining client info..\n";
+    
     auto clientAddress = server.getClientAddress();
     auto clientLength  = server.getClientLength();
+
+    cout << "Starting clock..\n";
     auto start = std::chrono::high_resolution_clock::now();
 
+    cout << "Creating new admin..\n";
+    
     Admin newAdmin(clientAddress, clientLength, start, interval);
     admins.push_back(newAdmin);
 
+    cout << "Marshalling\n";
+
     char header[HEADER_SIZE];
-    char response[4+1+4];
+    char response[4+1+4+4];
     char *cur = response;
-    utils::marshalInt(4+1+4,header);
+    utils::marshalInt(4+1+4+4,header);
 
     int responseID = getResponseID();
     utils::marshalInt(responseID,cur);
@@ -541,15 +550,22 @@ void Handler::service5(udp_server &server, char *p, int req_id, int status){
 
     utils::marshalString(ACK_SUCCESS,cur);
     cur += 1;
+
+    utils::marshalInt(4,cur);
+    cur += 4;
     
     utils::marshalInt(newAdmin.getRemaining(),cur);
 
     if(status == 2) memo[{cAddress,req_id}] = response;
 
+    cout << "Sending response\n";
+    
     server.send(header,HEADER_SIZE);
-    server.send(response,4+1+4);
+    server.send(response,4+1+4+4);
 
-    if(status >= 1) ackHandler(server, header, response, 4+1+4, responseID);
+    cout << "Handling ack\n";
+    
+    if(status >= 1) ackHandler(server, header, response, 4+1+4+4, responseID);
 }
 
 void Handler::service6(udp_server &server, char *p, int req_id, int status){
