@@ -46,7 +46,7 @@ class HandleMonitorUpdate{
         List message = new ArrayList();
 
         Utils.append(message, id);
-        Utils.append(message, Constants.SERVICE_DEPOSIT_MONEY);
+        Utils.append(message, Constants.SERVICE_MONITOR_UPDATE);
         Utils.appendMessage(message, duration);
 
         return Utils.byteUnboxing(message);
