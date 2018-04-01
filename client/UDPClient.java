@@ -252,59 +252,58 @@ class UDPClient
                 int curID = udpClient.getID();
                 switch(serviceType){
                     case Constants.SERVICE_OPEN_ACCOUNT:
-                        packageByte = HandleOpenAccount.createMessage(scanner, curID);
-                        if (packageByte.length > 0){
-                            try{
+                        try{
+                            packageByte = HandleOpenAccount.createMessage(scanner, curID);
+                            if (packageByte.length > 0){
                                 byte[] response = udpClient.sendAndReceive(packageByte, curID);
                                 HandleOpenAccount.handleResponse(response);
-                            } catch (Exception e){
-                                System.out.print(Constants.SEPARATOR);
-                                System.out.printf(Constants.ERR_MSG, e.getMessage());
-
                             }
+                        } catch (Exception e){
+                            System.out.print(Constants.SEPARATOR);
+                            System.out.printf(Constants.ERR_MSG, e.getMessage());
                         }
                         break;
                     case Constants.SERVICE_CLOSE_ACCOUNT:
-                        packageByte = HandleCloseAccount.createMessage(scanner, curID);
-                        if (packageByte.length != 0){
-                            try{
+                        try{
+                            packageByte = HandleCloseAccount.createMessage(scanner, curID);
+                            if (packageByte.length != 0){
                                 byte[] response = udpClient.sendAndReceive(packageByte, curID);
                                 HandleCloseAccount.handleResponse(response);
-                            } catch (Exception e){
-                                System.out.print(Constants.SEPARATOR);
-                                System.out.printf(Constants.ERR_MSG, e.getMessage());
                             }
+                        } catch (Exception e){
+                            System.out.print(Constants.SEPARATOR);
+                            System.out.printf(Constants.ERR_MSG, e.getMessage());
                         }
                         break;
                     case Constants.SERVICE_DEPOSIT_MONEY:
-                        packageByte = HandleDepositMoney.createMessage(scanner, curID);
-                        if (packageByte.length != 0){
-                            try{
+                        try{
+                            packageByte = HandleDepositMoney.createMessage(scanner, curID);
+                            if (packageByte.length != 0){
                                 byte[] response = udpClient.sendAndReceive(packageByte, curID);
                                 HandleDepositMoney.handleResponse(response);
-                            } catch (Exception e){
-                                System.out.print(Constants.SEPARATOR);
-                                System.out.printf(Constants.ERR_MSG, e.getMessage());
                             }
+                        } catch (Exception e){
+                            System.out.print(Constants.SEPARATOR);
+                            System.out.printf(Constants.ERR_MSG, e.getMessage());
                         }
                         break;
                     case Constants.SERVICE_WITHDRAW_MONEY:
-                        packageByte = HandleWithdrawMoney.createMessage(scanner, curID);
-                        if (packageByte.length != 0){
-                            try{
+                        try{
+                            packageByte = HandleWithdrawMoney.createMessage(scanner, curID);
+                            if (packageByte.length != 0){
                                 byte[] response = udpClient.sendAndReceive(packageByte, curID);
                                 HandleWithdrawMoney.handleResponse(response);
-                            } catch (Exception e){
-                                System.out.print(Constants.SEPARATOR);
-                                System.out.printf(Constants.ERR_MSG, e.getMessage());
                             }
+                        } catch (Exception e){
+                            System.out.print(Constants.SEPARATOR);
+                            System.out.printf(Constants.ERR_MSG, e.getMessage());
                         }
                         break;
                     case Constants.SERVICE_MONITOR_UPDATE:
-                        packageByte = HandleMonitorUpdate.createMessage(scanner, curID);
-                        if (packageByte.length != 0){
-                            int realTimeout = udpClient.getTimeout();
-                            try{
+                        int realTimeout = udpClient.getTimeout();
+                        try{
+                            packageByte = HandleMonitorUpdate.createMessage(scanner, curID);
+                            if (packageByte.length != 0){
                                 System.out.println(Constants.SEPARATOR);
                                 byte[] response = udpClient.sendAndReceive(packageByte, curID);
                                 int remainingDuration = HandleMonitorUpdate.handleResponse(response);
@@ -313,40 +312,40 @@ class UDPClient
                                     byte[] update = udpClient.receive();
                                     remainingDuration = HandleMonitorUpdate.handleResponse(update);
                                 } while(true);
-                            } catch (SocketTimeoutException e){
-                                udpClient.setTimeout(realTimeout);
-                                System.out.println(Constants.MONITORING_FINISH_MSG);
-                                System.out.println();
-                                System.out.println(Constants.SEPARATOR);
-                            } catch (Exception e){
-                                udpClient.setTimeout(realTimeout);
-                                System.out.print(Constants.SEPARATOR);
-                                System.out.printf(Constants.ERR_MSG, e.getMessage());
                             }
+                        } catch (SocketTimeoutException e){
+                            udpClient.setTimeout(realTimeout);
+                            System.out.println(Constants.MONITORING_FINISH_MSG);
+                            System.out.println();
+                            System.out.println(Constants.SEPARATOR);
+                        } catch (Exception e){
+                            udpClient.setTimeout(realTimeout);
+                            System.out.print(Constants.SEPARATOR);
+                            System.out.printf(Constants.ERR_MSG, e.getMessage());
                         }
                         break;
                     case Constants.SERVICE_TRANSFER_MONEY:
-                        packageByte = HandleTransferMoney.createMessage(scanner, curID);
-                        if (packageByte.length != 0){
-                            try{
+                        try{
+                            packageByte = HandleTransferMoney.createMessage(scanner, curID);
+                            if (packageByte.length != 0){
                                 byte[] response = udpClient.sendAndReceive(packageByte, curID);
                                 HandleTransferMoney.handleResponse(response);
-                            } catch (Exception e){
-                                System.out.print(Constants.SEPARATOR);
-                                System.out.printf(Constants.ERR_MSG, e.getMessage());
                             }
+                        } catch (Exception e){
+                            System.out.print(Constants.SEPARATOR);
+                            System.out.printf(Constants.ERR_MSG, e.getMessage());
                         }
                         break;
                     case Constants.SERVICE_CHANGE_PASSWORD:
-                        packageByte = HandleChangePassword.createMessage(scanner, curID);
-                        if (packageByte.length != 0){
-                            try{
-                                byte[] response = udpClient.sendAndReceive(packageByte, curID);
-                                HandleChangePassword.handleResponse(response);
-                            } catch (Exception e){
-                                System.out.print(Constants.SEPARATOR);
-                                System.out.printf(Constants.ERR_MSG, e.getMessage());
+                        try{
+                            packageByte = HandleChangePassword.createMessage(scanner, curID);
+                            if (packageByte.length != 0){
+                                    byte[] response = udpClient.sendAndReceive(packageByte, curID);
+                                    HandleChangePassword.handleResponse(response);
                             }
+                        } catch (Exception e){
+                            System.out.print(Constants.SEPARATOR);
+                            System.out.printf(Constants.ERR_MSG, e.getMessage());
                         }
                         break;
                     case Constants.SERVICE_EXIT:
