@@ -9,7 +9,7 @@ class Utils{
     // Marshal and unmarshal String
     public static byte[] marshal(String s) throws UnsupportedEncodingException{
         byte[] ret = new byte[s.length()];
-        for(int i=0;i<s.length();i++) {
+        for(int i = 0; i < s.length(); i++) {
             ret[i] = (byte)s.charAt(i);
         }
         return ret;
@@ -69,14 +69,14 @@ class Utils{
     // Boxing and unboxing bytes
 	public static Byte[] byteBoxing(byte[] b){
 		Byte[] ret = new Byte[b.length];
-		for(int i=0;i<b.length;i++)
+		for(int i = 0; i < b.length; i++)
 			ret[i] = Byte.valueOf(b[i]);
 		return ret;
 	}
 
 	public static byte[] byteUnboxing(Byte[] b){
 		byte[] ret = new byte[b.length];
-		for(int i=0;i<b.length;i++)
+		for(int i = 0; i < b.length; i++)
 			ret[i] = b[i].byteValue();
 		return ret;
     }
