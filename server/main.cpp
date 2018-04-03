@@ -10,7 +10,7 @@ char header[4];
 char *buffer;
 int message_length;
 Handler handler;
-
+double failureRate;
 int status;
 /*
 void send(udp_server &server){
@@ -76,8 +76,9 @@ void receive(udp_server &server){
 
 int main(int argc, char **argv){
     /*
-      <program> <port> <status>
+      <program> <port> <status> <failure>
      */
+
     if (argc < 2) portno = 8080;
     else portno = atoi(argv[1]);
 
@@ -85,7 +86,10 @@ int main(int argc, char **argv){
         
     if(argc >= 3) status = atoi(argv[2]);
 
-    udp_server server(portno);
+    failureRate = 0;
+    if(argc >= 4) failureRate = (double)(atoi(argv[3])) / (double)100.0;
+    
+    udp_server server(portno,failureRate);
     handler = Handler();
     while(true){
         receive(server);

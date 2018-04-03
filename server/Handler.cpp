@@ -57,8 +57,8 @@ void Handler::notify(udp_server &server, string s, int status){
                 if(n <= 0){
                     if(admin.isAvailable()){
                         utils::marshalInt(admin.getRemaining(),rem);
-                        server.send(header,HEADER_SIZE);
-                        server.send(response,4+1+4+4+4+(int)s.size());
+                        server.send(header,HEADER_SIZE,admin.getAddress(),admin.getLength());
+                        server.send(response,4+1+4+4+4+(int)s.size(),admin.getAddress(),admin.getLength());
                         continue;
                     }
                     else break;
@@ -70,8 +70,8 @@ void Handler::notify(udp_server &server, string s, int status){
                 if(n <= 0){
                     if(admin.isAvailable()){
                         utils::marshalInt(admin.getRemaining(),rem);
-                        server.send(header,HEADER_SIZE);
-                        server.send(response,4+1+4+4+4+(int)s.size());
+                        server.send(header,HEADER_SIZE,admin.getAddress(),admin.getLength());
+                        server.send(response,4+1+4+4+4+(int)s.size(),admin.getAddress(),admin.getLength());
                         continue;
                     }
                     else break;

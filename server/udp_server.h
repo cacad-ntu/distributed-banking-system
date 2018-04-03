@@ -10,6 +10,8 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <iostream>
+#include <chrono>
+#include <random>
 using namespace std;
 
 class udp_server{
@@ -27,7 +29,12 @@ private:
     int n; /* message byte size */
 
     struct timeval tv;
-    
+
+    unsigned seed;
+    mt19937 generator;
+    std::uniform_real_distribution<double> distribution;
+
+    double failureRate;
 public:
     int receive_time(char *buf, size_t bufsize, int timeout_in_seconds);
     void send(const char *buf, size_t bufsize);
@@ -36,7 +43,7 @@ public:
     struct sockaddr_in getClientAddress();
     unsigned getClientLength();
     
-    udp_server(int port);
+    udp_server(int port, double _failureRate);
 };
 
 #endif
