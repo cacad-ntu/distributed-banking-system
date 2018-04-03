@@ -113,8 +113,8 @@ class UDPClient
 
     public void sendACK(int curID) throws IOException, InterruptedException{
         List message = new ArrayList();
-        Utils.append(message, Constants.ACK_CHAR);
         Utils.append(message, curID);
+        Utils.append(message, Constants.ACK_CHAR);
 
         this.send(Utils.byteUnboxing(message));
     }
