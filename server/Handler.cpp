@@ -20,8 +20,6 @@ void Handler::notify(udp_server &server, string s, int status){
     while(admins.size() && !admins[0].isAvailable())
         admins.pop_front();
 
-    char ackheader[HEADER_SIZE];
-    char ack[1];
     
     for(auto admin:admins){
         char *cur = response;
@@ -52,8 +50,11 @@ void Handler::notify(udp_server &server, string s, int status){
 
         if(status >= 1){
             while(admin.isAvailable()){
+                char ackHeader[HEADER_SIZE];
+
                 cout << "WAITING FOR ACK HEADER\n";
-                int n = server.receive_time(header,HEADER_SIZE,1);
+                int n = server.receive_time(ackHeader,HEADER_SIZE,1);
+                
                 if(n <= 0){
                     if(admin.isAvailable()){
                         utils::marshalInt(admin.getRemaining(),rem);
@@ -63,10 +64,12 @@ void Handler::notify(udp_server &server, string s, int status){
                     }
                     else break;
                 }
-                char* ack = new char[5];
+
+                int ackSize = utils::unmarshalInt(ackHeader);
+                char* ack = new char[ackSize];
 
                 cout << "WAITING FOR ACK\n";
-                n = server.receive_time(ack,5,1);
+                n = server.receive_time(ack,ackSize,1);
                 if(n <= 0){
                     if(admin.isAvailable()){
                         utils::marshalInt(admin.getRemaining(),rem);
@@ -96,9 +99,12 @@ void Handler::notify(udp_server &server, string s, int status){
 }
 
 void Handler::ackHandler(udp_server &server, char *header, char *response, int responseSize, int responseID, int status, unsigned long cAddress){
+    char ackHeader[HEADER_SIZE];
+    
     while(1){
         cout << "WAITING FOR ACK HEADER\n";
-        int n = server.receive_time(header,HEADER_SIZE,1);
+        int n = server.receive_time(ackHeader,HEADER_SIZE,1);
+
         if(n <= 0){
             cout << "Resending header:" << utils::unmarshalInt(header) << "..\n";
             server.send(header,HEADER_SIZE);
@@ -106,7 +112,7 @@ void Handler::ackHandler(udp_server &server, char *header, char *response, int r
             continue;
         }
 
-        int ackSize = utils::unmarshalInt(header);
+        int ackSize = utils::unmarshalInt(ackHeader);
         
         char* ack = new char[ackSize];
 
