@@ -19,7 +19,7 @@ class Handler{
     map<pair<unsigned long,int>,char*> memo;
     int response_id;
  public:
-    void ackHandler(udp_server &server, char *header, char *response, int responseSize, int responseID);
+    void ackHandler(udp_server &server, char *header, char *response, int responseSize, int responseID, int status, unsigned long cAddress);
     int getResponseID();
     void notify(udp_server &server, string s, int status);
     void service1(udp_server &server, char *p, int req_id, int status);
@@ -29,7 +29,7 @@ class Handler{
     void service5(udp_server &server, char *p, int req_id, int status);
     void service6(udp_server &server, char *p, int req_id, int status);
     void service7(udp_server &server, char *p, int req_id, int status);
-
+    bool checkAndSendOldResponse(udp_server &server, unsigned long cAddress, int req_id);
     Handler();
 };
 #endif
