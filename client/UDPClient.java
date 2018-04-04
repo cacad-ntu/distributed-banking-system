@@ -139,7 +139,7 @@ class UDPClient
         return response;
     }
 
-    public static void main(String[] args){
+    public static void main(String[] args)throws Exception{
         Options options = new Options();
 
         Option opHost = new Option("h", "host", true, "Server host");
