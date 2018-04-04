@@ -23,10 +23,16 @@ java -cp .:lib/* client.UDPClient -h <HOST NAME> -p <PORT> [-al] [-am] [-fr <FAI
 ```
 cd server
 g++ -o server -std=c++11 main.cpp udp_server.cpp utils.cpp Handler.cpp AccountManager.cpp Account.cpp Admin.cpp
-./server <PORT> <MODE>
+./server <PORT> <MODE> <FAULT> <LIMIT>
 ```
-Note: <MODE> is the invocation semantic. Possible values:
+Note:
+
+<MODE> is the invocation semantic. Possible values:
 
 - 0: no ack
 - 1: at-least-once
 - 2: at-most-once
+
+<FAULT> is the probability that server fails to reply
+
+<LIMIT> is the limit of retries
