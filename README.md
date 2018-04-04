@@ -27,12 +27,12 @@ g++ -o server -std=c++11 main.cpp udp_server.cpp utils.cpp Handler.cpp AccountMa
 ```
 Note:
 
-<MODE> is the invocation semantic. Possible values:
+```<MODE>``` is the invocation semantic. Possible values:
 
 - 0: no ack
 - 1: at-least-once
 - 2: at-most-once
 
-<FAULT> is the probability that server fails to reply
+```<FAULT>``` is the probability that server fails to reply
 
-<LIMIT> is the limit of retries
+```<LIMIT>``` is the limit of retries
