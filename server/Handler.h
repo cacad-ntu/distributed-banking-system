@@ -8,6 +8,7 @@
 #include "constants.h"
 #include <chrono>
 #include <deque>
+#include <string>
 #include <map>
 #include "Admin.h"
 using namespace std;
@@ -16,7 +17,7 @@ class Handler{
  private:
     deque<Admin> admins;
     AccountManager acManager;
-    map<pair<unsigned long,int>,pair<char*,int>> memo;
+    map<pair<unsigned long,int>,string> memo;
     
     int response_id;
     int limit;

@@ -15,12 +15,13 @@ int Handler::getResponseID(){
     return response_id++;
 }
 
-void Handler::sendReply(udp_server &server, char *header, char *response, int responseSize){
+void Handler::sendReply(udp_server &server, char *header, char *response, int responseSize){   
     if(distribution(generator) > failureRate){
         server.send(header,HEADER_SIZE);
         server.send(response, responseSize);
+        cout << ">>>>>>>>>>Response id " << utils::unmarshalInt(response) << " of length " << responseSize << " is sent\n";
     }
-    else cout << "Failure simulated..\n";
+    else cout << "################################Failure simulated#####################################\n";
 }
 
 void Handler::notify(udp_server &server, string s, int status){
@@ -160,12 +161,19 @@ bool Handler::checkAndSendOldResponse(udp_server &server, unsigned long cAddress
     if(!memo.count({cAddress,req_id})) return false;
     char header[HEADER_SIZE];
 
-    char *response = memo[{cAddress,req_id}].first;
-    int size = memo[{cAddress,req_id}].second;
+    string str = memo[{cAddress,req_id}];
+    
+    char *response = new char[str.size()];
+    for(int i=0;i<(int)str.size();i++)
+        response[i] = str[i];
+    
+    int size = (int)str.size();
         
     utils::marshalInt(size,header);
     sendReply(server,header,response,size);
     cout << "Old response of size " << size << " is sent back\n";
+    cout << "??????Status byte is: " << (int)*(response+4) << '\n';
+    cout << "??????Status byte iz: " << (int)str[4] << '\n';
     //cout << "Account number sent is " << getS1AccNum(response) << "\n";
     return true;
 }
@@ -227,7 +235,9 @@ void Handler::service1(udp_server &server, char *p, int req_id, int status){
 
     utils::marshalInt(accountNum,cur);
 
-    if(status == 2) memo[{cAddress,req_id}] = {response,4+1+4+4};
+    cout << "!!!!!!!Saving response with status byte " << (int)*(response+4) << " into memo!!!!!!!!!\n";
+
+    if(status == 2) memo[{cAddress,req_id}] = string(response,4+1+4+4);
 
     sendReply(server,header,response,4+1+4+4);
     
@@ -279,7 +289,7 @@ void Handler::service2(udp_server &server, char *p, int req_id, int status){
 
         utils::marshalString(ACK_SUCCESS,cur);
 
-        if(status == 2) memo[{cAddress,req_id}] = {response,4+1};
+        if(status == 2) memo[{cAddress,req_id}] = string(response,4+1);
 
         sendReply(server,header,response,4+1);
         
@@ -309,7 +319,7 @@ void Handler::service2(udp_server &server, char *p, int req_id, int status){
 
         utils::marshalString(err,cur);
 
-        if(status == 2) memo[{cAddress,req_id}] = {response,4+1+4+(int)err.size()};
+        if(status == 2) memo[{cAddress,req_id}] = string(response,4+1+4+(int)err.size());
 
         sendReply(server,header,response,4+1+4+(int)err.size());
         
@@ -382,7 +392,7 @@ void Handler::service3(udp_server &server, char *p, int req_id, int status){
         utils::marshalString(err,cur);
         cur += (int)err.size();
 
-        if(status == 2) memo[{cAddress,req_id}] = {response,4+1+4+(int)err.size()};
+        if(status == 2) memo[{cAddress,req_id}] = string(response,4+1+4+(int)err.size());
 
         sendReply(server,header,response,4+1+4+(int)err.size());
         
@@ -412,7 +422,7 @@ void Handler::service3(udp_server &server, char *p, int req_id, int status){
         
         utils::marshalFloat(balance.second,cur);
         
-        if(status == 2) memo[{cAddress,req_id}] = {response,4+1+4+4+4+4};
+        if(status == 2) memo[{cAddress,req_id}] = string(response,4+1+4+4+4+4);
 
         sendReply(server,header,response,4+1+4+4+4+4);
         
@@ -488,7 +498,7 @@ void Handler::service4(udp_server &server, char *p, int req_id, int status){
         utils::marshalString(err,cur);
         cur += (int)err.size();
 
-        if(status == 2) memo[{cAddress,req_id}] = {response,4+1+4+(int)err.size()};
+        if(status == 2) memo[{cAddress,req_id}] = string(response,4+1+4+(int)err.size());
 
         sendReply(server,header,response,4+1+4+(int)err.size());
         
@@ -519,7 +529,7 @@ void Handler::service4(udp_server &server, char *p, int req_id, int status){
         
         utils::marshalFloat(balance.second,cur);
 
-        if(status == 2) memo[{cAddress,req_id}] = {response,4+1+4+4+4+4};
+        if(status == 2) memo[{cAddress,req_id}] = string(response,4+1+4+4+4+4);
 
         sendReply(server,header,response,4+1+4+4+4+4);
         
@@ -587,7 +597,7 @@ void Handler::service5(udp_server &server, char *p, int req_id, int status){
     
     utils::marshalInt(newAdmin.getRemaining(),cur);
 
-    if(status == 2) memo[{cAddress,req_id}] = {response,4+1+4+4};
+    if(status == 2) memo[{cAddress,req_id}] = string(response,4+1+4+4);
 
     cout << "Sending response\n";
 
@@ -684,7 +694,7 @@ void Handler::service6(udp_server &server, char *p, int req_id, int status){
         utils::marshalString(err,cur);
         cur += (int)err.size();
 
-        if(status == 2) memo[{cAddress,req_id}] = {response,4+1+4+(int)err.size()};
+        if(status == 2) memo[{cAddress,req_id}] = string(response,4+1+4+(int)err.size());
 
         sendReply(server,header,response,4+1+4+(int)err.size());
         
@@ -714,7 +724,7 @@ void Handler::service6(udp_server &server, char *p, int req_id, int status){
 
         utils::marshalInt(4+1+4+4+4+4,header);
 
-        if(status == 2) memo[{cAddress,req_id}] = {response,4+1+4+4+4+4};
+        if(status == 2) memo[{cAddress,req_id}] = string(response,4+1+4+4+4+4);
 
         sendReply(server,header,response,4+1+4+4+4+4);
         
@@ -767,7 +777,7 @@ void Handler::service7(udp_server &server, char *p, int req_id, int status){
     if(success) utils::marshalString(ACK_SUCCESS,cur);
     else utils::marshalString(ACK_FAIL,cur);
 
-    if(status == 2) memo[{cAddress,req_id}] = {response,4+1};
+    if(status == 2) memo[{cAddress,req_id}] = string(response,4+1);
 
     sendReply(server,header,response,4+1);
 
