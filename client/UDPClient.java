@@ -363,6 +363,7 @@ class UDPClient
             System.out.printf(Constants.ERR_MSG, e.getMessage());
             System.out.println(Constants.EXIT_MSG);
             System.out.println(Constants.SEPARATOR);
+            throw(e);
         }
     }
 }
