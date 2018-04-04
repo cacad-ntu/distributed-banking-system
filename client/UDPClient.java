@@ -260,6 +260,7 @@ class UDPClient
                         } catch (Exception e){
                             System.out.print(Constants.SEPARATOR);
                             System.out.printf(Constants.ERR_MSG, e.getMessage());
+                            throw(e);
                         }
                         break;
                     case Constants.SERVICE_CLOSE_ACCOUNT:

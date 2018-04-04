@@ -93,12 +93,15 @@ class HandleOpenAccount{
         System.out.println(Constants.SEPARATOR);
         String statusStr = Utils.unmarshalString(response, 0, Constants.RESPONSE_TYPE_SIZE);
         int status = Integer.parseInt(statusStr);
+        System.out.printf("DEBUG: Status = %d\n", status);
         switch(status){
             case Constants.NAK:
+                System.out.printf("DEBUG: NAK\n", status);
                 String errMsg = Utils.unmarshalMsgString(response, Constants.RESPONSE_TYPE_SIZE);
                 System.out.printf(Constants.ERR_MSG, errMsg);
                 break;
             case Constants.ACK:
+                System.out.printf("DEBUG: ACK\n", status);
                 int accountNumber = Utils.unmarshalMsgInteger(response, Constants.RESPONSE_TYPE_SIZE);
                 System.out.println(Constants.SUCCESS_MSG);
                 System.out.printf(Constants.SUCCESSFUL_OPEN_ACCOUNT, accountNumber);
