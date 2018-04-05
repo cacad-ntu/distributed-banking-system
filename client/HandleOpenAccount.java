@@ -89,19 +89,19 @@ class HandleOpenAccount{
         return Utils.byteUnboxing(message);
     }
 
-    public static void handleResponse(byte[] response){
+    public static void handleResponse(byte[] response, boolean debug){
         System.out.println(Constants.SEPARATOR);
         String statusStr = Utils.unmarshalString(response, 0, Constants.RESPONSE_TYPE_SIZE);
         int status = Integer.parseInt(statusStr);
-        System.out.printf("DEBUG: Status = %d\n", status);
+        if (debug) System.out.printf("[DEBUG][HandleOpenAccount][Status = %d]\n", status);
         switch(status){
             case Constants.NAK:
-                System.out.printf("DEBUG: NAK\n", status);
+                if (debug) System.out.println("[DEBUG][HandleOpenAccount][Unsuccessful response]");
                 String errMsg = Utils.unmarshalMsgString(response, Constants.RESPONSE_TYPE_SIZE);
                 System.out.printf(Constants.ERR_MSG, errMsg);
                 break;
             case Constants.ACK:
-                System.out.printf("DEBUG: ACK\n", status);
+                if (debug) System.out.println("[DEBUG][HandleOpenAccount][Successful response]");
                 int accountNumber = Utils.unmarshalMsgInteger(response, Constants.RESPONSE_TYPE_SIZE);
                 System.out.println(Constants.SUCCESS_MSG);
                 System.out.printf(Constants.SUCCESSFUL_OPEN_ACCOUNT, accountNumber);

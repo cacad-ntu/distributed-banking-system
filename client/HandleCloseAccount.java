@@ -74,16 +74,19 @@ class HandleCloseAccount{
         return Utils.byteUnboxing(message);
     }
 
-    public static void handleResponse(byte[] response){
+    public static void handleResponse(byte[] response, boolean debug){
         System.out.println(Constants.SEPARATOR);
         String statusStr = Utils.unmarshalString(response, 0, Constants.RESPONSE_TYPE_SIZE);
         int status = Integer.parseInt(statusStr);
+        if (debug) System.out.printf("[DEBUG][HandleCloseAccount][Status = %d]\n", status);
         switch(status){
             case Constants.NAK:
+                if (debug) System.out.println("[DEBUG][HandleCloseAccount][Unsuccessful response]");
                 String errMsg = Utils.unmarshalMsgString(response, Constants.RESPONSE_TYPE_SIZE);
                 System.out.printf(Constants.ERR_MSG, errMsg);
                 break;
             case Constants.ACK:
+                if (debug) System.out.println("[DEBUG][HandleCloseAccount][Successful response]");
                 System.out.println(Constants.SUCCESSFUL_CLOSE_ACCOUNT);
                 break;
             default:
