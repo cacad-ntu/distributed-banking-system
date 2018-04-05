@@ -145,12 +145,13 @@ class UDPClient
 
     /**
      * Receive message from server, send ACK if success
+     * @param monitor {@code boolean} Whether need to send ACK for response
      * @return {@code byte[]} response message from server
      * @throws IOException
      * @throws InterruptedException
      * @since 1.9
      */
-    public byte[] receive() throws IOException, InterruptedException{
+    public byte[] receive(boolean monitor) throws IOException, InterruptedException{
         int responseID;
         int messageLength;
         DatagramPacket receivePacket;
@@ -175,7 +176,7 @@ class UDPClient
             }
         } while(this.semInvo >= Constants.AT_MOST_ONE_SEM_INVO);
 
-        if(this.getSemInvo() >= Constants.AT_MOST_ONE_SEM_INVO){
+        if(this.getSemInvo() >= Constants.AT_MOST_ONE_SEM_INVO || (monitor && this.getSemInvo() >= Constants.AT_LEAST_ONE_SEM_INVO)){
             if (this.debug) System.out.printf("[DEBUG][UPDClient][SEND ACK: %d]\n", responseID);
             this.sendACK(responseID);
         }
@@ -216,7 +217,7 @@ class UDPClient
         do{
             try{
                 this.send(packageByte);
-                response = this.receive();
+                response = this.receive(false);
                 break;
             } catch(SocketTimeoutException e){
                 timeoutCount++;
@@ -419,7 +420,7 @@ class UDPClient
                                 int remainingDuration = HandleMonitorUpdate.handleResponse(response, debug);
                                 do{
                                     udpClient.setTimeout(remainingDuration);
-                                    byte[] update = udpClient.receive();
+                                    byte[] update = udpClient.receive(true);
                                     remainingDuration = HandleMonitorUpdate.handleResponse(update, debug);
                                 } while(true);
                             }
