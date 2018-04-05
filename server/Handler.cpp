@@ -165,6 +165,7 @@ void Handler::ackHandler(udp_server &server, char *header, char *response, int r
         }
         else{
             cout << "ID mismatch!\nACK ID: " << ack_id << "\nResponse ID: " << responseID << "\n";
+            sendReply(server,header,response,responseSize);
         }
     }
 }
@@ -209,6 +210,7 @@ int Handler::getS1AccNum(char *response){
    5. notifies monitoring users
  */
 void Handler::service1(udp_server &server, char *p, int req_id, int status){
+    cout << "################################Service 1#####################################\n";
     unsigned long cAddress = server.getClientAddress().sin_addr.s_addr;
 
     if(status == 2 && checkAndSendOldResponse(server,cAddress,req_id))
@@ -279,6 +281,7 @@ void Handler::service1(udp_server &server, char *p, int req_id, int status){
    5. notifies monitoring users
  */
 void Handler::service2(udp_server &server, char *p, int req_id, int status){
+    cout << "################################Service 2#####################################\n";
     unsigned long cAddress = server.getClientAddress().sin_addr.s_addr;
 
     if(status == 2 && checkAndSendOldResponse(server,cAddress,req_id))
@@ -368,6 +371,7 @@ void Handler::service2(udp_server &server, char *p, int req_id, int status){
    5. notifies monitoring users
  */
 void Handler::service3(udp_server &server, char *p, int req_id, int status){
+    cout << "################################Service 3#####################################\n";
     unsigned long cAddress = server.getClientAddress().sin_addr.s_addr;
 
     if(status == 2 && checkAndSendOldResponse(server,cAddress,req_id))
@@ -481,6 +485,7 @@ void Handler::service3(udp_server &server, char *p, int req_id, int status){
    5. notifies monitoring users
  */
 void Handler::service4(udp_server &server, char *p, int req_id, int status){
+    cout << "################################Service 4#####################################\n";
     unsigned long cAddress = server.getClientAddress().sin_addr.s_addr;
 
     if(status == 2 && checkAndSendOldResponse(server,cAddress,req_id))
@@ -595,6 +600,7 @@ void Handler::service4(udp_server &server, char *p, int req_id, int status){
    4. handles ack
  */
 void Handler::service5(udp_server &server, char *p, int req_id, int status){
+    cout << "################################Service 5#####################################\n";
     cout << "Beginning service 5\n";
     unsigned long cAddress = server.getClientAddress().sin_addr.s_addr;
 
@@ -659,6 +665,7 @@ void Handler::service5(udp_server &server, char *p, int req_id, int status){
    5. notifies monitoring users
  */
 void Handler::service6(udp_server &server, char *p, int req_id, int status){
+    cout << "################################Service 6#####################################\n";
     unsigned long cAddress = server.getClientAddress().sin_addr.s_addr;
 
     if(status == 2 && checkAndSendOldResponse(server,cAddress,req_id))
@@ -792,6 +799,7 @@ void Handler::service6(udp_server &server, char *p, int req_id, int status){
    5. notifies monitoring users
  */
 void Handler::service7(udp_server &server, char *p, int req_id, int status){
+    cout << "################################Service 7#####################################\n";
     unsigned long cAddress = server.getClientAddress().sin_addr.s_addr;
 
     if(status == 2 && checkAndSendOldResponse(server,cAddress,req_id))
