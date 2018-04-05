@@ -11,10 +11,16 @@ Handler::Handler(int _limit, double _failureRate){
     failureRate = _failureRate;
 }
 
+/**
+   Increments response ID
+ */
 int Handler::getResponseID(){
     return response_id++;
 }
 
+/**
+   Sends response under certain failure rate
+ */
 void Handler::sendReply(udp_server &server, char *header, char *response, int responseSize){   
     if(distribution(generator) > failureRate){
         server.send(header,HEADER_SIZE);
@@ -24,13 +30,16 @@ void Handler::sendReply(udp_server &server, char *header, char *response, int re
     else cout << "################################Failure simulated#####################################\n";
 }
 
-void Handler::notify(udp_server &server, string s, int status){
+/**
+   Notifies monitoring users by sending notification string 
+ */
+void Handler::notify(udp_server &server, string notif, int status){
     if((int)admins.size() == 0) return;
     
     char header[HEADER_SIZE];
-    utils::marshalInt(4 + 1 + 4 + 4 + 4 + (int)s.size(), header);
+    utils::marshalInt(ID_SIZE + STATUS_SIZE + 3*INT_SIZE + (int)notif.size(), header);
 
-    char *response = new char[4+1+4+4+4+(int)s.size()];
+    char *response = new char[ID_SIZE + STATUS_SIZE + 3*INT_SIZE + (int)notif.size()];
 
     while(admins.size() && !admins[0].isAvailable())
         admins.pop_front();
@@ -42,39 +51,39 @@ void Handler::notify(udp_server &server, string s, int status){
         int responseID = getResponseID();
         
         utils::marshalInt(responseID,cur);
-        cur += 4;
+        cur += INT_SIZE;
 
         utils::marshalString(ACK_SUCCESS,cur);
-        cur += 1;
+        cur += STATUS_SIZE;
 
-        utils::marshalInt(4,cur);
-        cur += 4;
+        utils::marshalInt(INT_SIZE,cur);
+        cur += INT_SIZE;
 
         char *rem = cur;
         utils::marshalInt(admin.getRemaining(),cur);
-        cur += 4;
+        cur += INT_SIZE;
         
-        utils::marshalInt((int)s.size(),cur);
-        cur += 4;
+        utils::marshalInt((int)notif.size(),cur);
+        cur += INT_SIZE;
     
-        utils::marshalString(s,cur);
-        cur += (int)s.size();
+        utils::marshalString(notif,cur);
+        cur += (int)notif.size();
         
         server.send(header,HEADER_SIZE,admin.getAddress(),admin.getLength());
-        server.send(response,4+1+4+4+4+(int)s.size(),admin.getAddress(),admin.getLength());
+        server.send(response,ID_SIZE + STATUS_SIZE + 3*INT_SIZE + (int)notif.size(),admin.getAddress(),admin.getLength());
 
         if(status >= 1){
             while(admin.isAvailable()){
                 char ackHeader[HEADER_SIZE];
 
                 cout << "WAITING FOR ACK HEADER\n";
-                int n = server.receive_time(ackHeader,HEADER_SIZE,1);
+                int n = server.receive_time(ackHeader,HEADER_SIZE,RECEIVE_TIMEOUT);
                 
                 if(n <= 0){
                     if(admin.isAvailable()){
                         utils::marshalInt(admin.getRemaining(),rem);
                         server.send(header,HEADER_SIZE,admin.getAddress(),admin.getLength());
-                        server.send(response,4+1+4+4+4+(int)s.size(),admin.getAddress(),admin.getLength());
+                        server.send(response,ID_SIZE + STATUS_SIZE + 3*INT_SIZE + (int)notif.size(),admin.getAddress(),admin.getLength());
                         continue;
                     }
                     else break;
@@ -84,19 +93,19 @@ void Handler::notify(udp_server &server, string s, int status){
                 char* ack = new char[ackSize];
 
                 cout << "WAITING FOR ACK\n";
-                n = server.receive_time(ack,ackSize,1);
+                n = server.receive_time(ack,ackSize,RECEIVE_TIMEOUT);
                 if(n <= 0){
                     if(admin.isAvailable()){
                         utils::marshalInt(admin.getRemaining(),rem);
                         server.send(header,HEADER_SIZE,admin.getAddress(),admin.getLength());
-                        server.send(response,4+1+4+4+4+(int)s.size(),admin.getAddress(),admin.getLength());
+                        server.send(response,ID_SIZE + STATUS_SIZE + 3*INT_SIZE + (int)notif.size(),admin.getAddress(),admin.getLength());
                         continue;
                     }
                     else break;
                 }
                 char *x = ack;
                 int ack_id = utils::unmarshalInt(x);
-                x += 4;
+                x += ID_SIZE;
                 
                 if(ack_id == responseID) break;
                 else if(status == 2 && checkAndSendOldResponse(server,admin.getAddress().sin_addr.s_addr,ack_id)){
@@ -113,13 +122,16 @@ void Handler::notify(udp_server &server, string s, int status){
     }
 }
 
+/**
+   Repeatedly listens for incoming ack and resends response each timeout
+ */
 void Handler::ackHandler(udp_server &server, char *header, char *response, int responseSize, int responseID, int status, unsigned long cAddress){
     char ackHeader[HEADER_SIZE];
 
     for(int i=1; i!=limit+1; i++){
 
         cout << "WAITING FOR ACK HEADER\n";
-        int n = server.receive_time(ackHeader,HEADER_SIZE,1);
+        int n = server.receive_time(ackHeader,HEADER_SIZE,RECEIVE_TIMEOUT);
 
         if(n <= 0){
             cout << "Timeout!, resending response ... \n";
@@ -132,7 +144,7 @@ void Handler::ackHandler(udp_server &server, char *header, char *response, int r
         char* ack = new char[ackSize];
 
         cout << "WAITING FOR ACK\n";
-        n = server.receive_time(ack,ackSize,1);
+        n = server.receive_time(ack,ackSize,RECEIVE_TIMEOUT);
         
         if(n <= 0){
             cout << "Timeout!, resending response ... \n";
@@ -142,7 +154,7 @@ void Handler::ackHandler(udp_server &server, char *header, char *response, int r
         
         char *x = ack;
         int ack_id = utils::unmarshalInt(x);
-        x += 4;
+        x += ID_SIZE;
         
         if(ack_id == responseID) break;
         else if(status == 2 && checkAndSendOldResponse(server,cAddress,ack_id)){
@@ -157,6 +169,10 @@ void Handler::ackHandler(udp_server &server, char *header, char *response, int r
     }
 }
 
+/**
+   Checks whether message is a duplicate based on req_id
+   and if so, sends the old response
+ */
 bool Handler::checkAndSendOldResponse(udp_server &server, unsigned long cAddress, int req_id){
     if(!memo.count({cAddress,req_id})) return false;
     char header[HEADER_SIZE];
@@ -172,18 +188,26 @@ bool Handler::checkAndSendOldResponse(udp_server &server, unsigned long cAddress
     utils::marshalInt(size,header);
     sendReply(server,header,response,size);
     cout << "Old response of size " << size << " is sent back\n";
-    cout << "??????Status byte is: " << (int)*(response+4) << '\n';
-    cout << "??????Status byte iz: " << (int)str[4] << '\n';
+    cout << "??????Status byte is: " << (int)*(response+ID_SIZE) << '\n';
+    cout << "??????Status byte iz: " << (int)str[ID_SIZE] << '\n';
     //cout << "Account number sent is " << getS1AccNum(response) << "\n";
     return true;
 }
 
 int Handler::getS1AccNum(char *response){
     char *c = response;
-    c += 4+1+4;
+    c += ID_SIZE + STATUS_SIZE + INT_SIZE;
     return utils::unmarshalInt(c);
 }
 
+/**
+   Handles service 1 (create account):
+   1. unmarshal request
+   2. create account
+   3. marshals and sends response
+   4. handles ack
+   5. notifies monitoring users
+ */
 void Handler::service1(udp_server &server, char *p, int req_id, int status){
     unsigned long cAddress = server.getClientAddress().sin_addr.s_addr;
 
@@ -195,22 +219,22 @@ void Handler::service1(udp_server &server, char *p, int req_id, int status){
     string passw, name;
 
     int length = utils::unmarshalInt(p);
-    p += 4;
+    p += INT_SIZE;
     name = utils::unmarshalString(p,length);
     p += length;
     
     length = utils::unmarshalInt(p);
-    p += 4;
+    p += INT_SIZE;
     passw = utils::unmarshalString(p,length);
     p += length;
 
     length = utils::unmarshalInt(p);
-    p += 4;
+    p += INT_SIZE;
     currency = utils::unmarshalInt(p);
     p += length;
 
     length = utils::unmarshalInt(p);
-    p += 4;
+    p += INT_SIZE;
     balance = utils::unmarshalFloat(p);
     p += length;
 
@@ -218,34 +242,42 @@ void Handler::service1(udp_server &server, char *p, int req_id, int status){
     cout << "Created account with account no. " << accountNum << '\n';
     
     char header[HEADER_SIZE];
-    char response[4+1+4+4];
+    char response[ID_SIZE+STATUS_SIZE+INT_SIZE+FLOAT_SIZE];
 
-    utils::marshalInt(4+1+4+4,header);
+    utils::marshalInt(ID_SIZE+STATUS_SIZE+INT_SIZE+FLOAT_SIZE,header);
     char *cur = response;
 
     int responseID = getResponseID();
     utils::marshalInt(responseID,cur);
-    cur += 4;
+    cur += ID_SIZE;
 
     utils::marshalString(ACK,cur);
-    cur += 1;
+    cur += STATUS_SIZE;
 
-    utils::marshalInt(4,cur);
-    cur += 4;
+    utils::marshalInt(INT_SIZE,cur);
+    cur += INT_SIZE;
 
     utils::marshalInt(accountNum,cur);
 
-    cout << "!!!!!!!Saving response with status byte " << (int)*(response+4) << " into memo!!!!!!!!!\n";
+    cout << "!!!!!!!Saving response with status byte " << (int)*(response+ID_SIZE) << " into memo!!!!!!!!!\n";
 
-    if(status == 2) memo[{cAddress,req_id}] = string(response,4+1+4+4);
+    if(status == 2) memo[{cAddress,req_id}] = string(response,ID_SIZE+STATUS_SIZE+2*INT_SIZE);
 
-    sendReply(server,header,response,4+1+4+4);
+    sendReply(server,header,response,ID_SIZE+STATUS_SIZE+2*INT_SIZE);
     
-    if(status >= 1) ackHandler(server, header, response, 4+1+4+4, responseID, status, cAddress);
+    if(status >= 1) ackHandler(server, header, response, ID_SIZE+STATUS_SIZE+2*INT_SIZE, responseID, status, cAddress);
     
     notify(server,"Opened a new account with name " + name + ", currency " + to_string(currency) + ", balance " + to_string(balance) + ".", status);
 }
 
+/**
+   Handles service 2 (delete account):
+   1. unmarshal request
+   2. delete account
+   3. marshals and sends response
+   4. handles ack
+   5. notifies monitoring users
+ */
 void Handler::service2(udp_server &server, char *p, int req_id, int status){
     unsigned long cAddress = server.getClientAddress().sin_addr.s_addr;
 
@@ -256,17 +288,17 @@ void Handler::service2(udp_server &server, char *p, int req_id, int status){
     string passw, name;
 
     int length = utils::unmarshalInt(p);
-    p += 4;
+    p += INT_SIZE;
     name = utils::unmarshalString(p,length);
     p += length;
     
     length = utils::unmarshalInt(p);
-    p += 4;
+    p += INT_SIZE;
     accountNum = utils::unmarshalInt(p);
     p += length;
 
     length = utils::unmarshalInt(p);
-    p += 4;
+    p += INT_SIZE;
     passw = utils::unmarshalString(p,length);
     p += length;
 
@@ -276,24 +308,24 @@ void Handler::service2(udp_server &server, char *p, int req_id, int status){
    
     
     if(success){
-        char *response = new char[4+1];
+        char *response = new char[ID_SIZE+STATUS_SIZE];
         char *cur = response;
 
         cout << "Success deleting account\n";
 
-        utils::marshalInt(4+1,header);
+        utils::marshalInt(ID_SIZE+STATUS_SIZE,header);
 
         int responseID = getResponseID();
         utils::marshalInt(responseID,cur);
-        cur += 4;
+        cur += ID_SIZE;
 
         utils::marshalString(ACK_SUCCESS,cur);
 
-        if(status == 2) memo[{cAddress,req_id}] = string(response,4+1);
+        if(status == 2) memo[{cAddress,req_id}] = string(response,ID_SIZE+STATUS_SIZE);
 
-        sendReply(server,header,response,4+1);
+        sendReply(server,header,response,ID_SIZE+STATUS_SIZE);
         
-        if(status >= 1) ackHandler(server, header, response, 4+1, responseID, status, cAddress);
+        if(status >= 1) ackHandler(server, header, response, ID_SIZE+STATUS_SIZE, responseID, status, cAddress);
         
         notify(server,"Deleted account no. " + to_string(accountNum) + " (" + name + ").", status);
     }
@@ -302,31 +334,39 @@ void Handler::service2(udp_server &server, char *p, int req_id, int status){
         cout << "Unsuccessful deletion\n";
         string err = "Wrong account number, name, or password!";
 
-        char *response = new char[4+1+4+(int)err.size()];
+        char *response = new char[ID_SIZE+STATUS_SIZE+INT_SIZE+(int)err.size()];
         char *cur = response;
 
-        utils::marshalInt(4+1+4+(int)err.size(),header);
+        utils::marshalInt(ID_SIZE+STATUS_SIZE+INT_SIZE+(int)err.size(),header);
 
         int responseID = getResponseID();
         utils::marshalInt(responseID,cur);
-        cur += 4;
+        cur += ID_SIZE;
         
         utils::marshalString(ACK_FAIL,cur);
-        cur += 1;
+        cur += STATUS_SIZE;
 
         utils::marshalInt((int)err.size(),cur);
-        cur += 4;
+        cur += INT_SIZE;
 
         utils::marshalString(err,cur);
 
-        if(status == 2) memo[{cAddress,req_id}] = string(response,4+1+4+(int)err.size());
+        if(status == 2) memo[{cAddress,req_id}] = string(response,ID_SIZE+STATUS_SIZE+INT_SIZE+(int)err.size());
 
-        sendReply(server,header,response,4+1+4+(int)err.size());
+        sendReply(server,header,response,ID_SIZE+STATUS_SIZE+INT_SIZE+(int)err.size());
         
-        if(status >= 1) ackHandler(server, header, response, 4+1+4+(int)err.size(), responseID, status, cAddress);
+        if(status >= 1) ackHandler(server, header, response, ID_SIZE+STATUS_SIZE+INT_SIZE+(int)err.size(), responseID, status, cAddress);
     }
 }
 
+/**
+   Handles service 3 (deposit):
+   1. unmarshal request
+   2. deposit balance
+   3. marshals and sends response
+   4. handles ack
+   5. notifies monitoring users
+ */
 void Handler::service3(udp_server &server, char *p, int req_id, int status){
     unsigned long cAddress = server.getClientAddress().sin_addr.s_addr;
 
@@ -338,27 +378,27 @@ void Handler::service3(udp_server &server, char *p, int req_id, int status){
     string passw, name;
     
     int length = utils::unmarshalInt(p);
-    p += 4;
+    p += INT_SIZE;
     name = utils::unmarshalString(p,length);
     p += length;
 
     length = utils::unmarshalInt(p);
-    p += 4;
+    p += INT_SIZE;
     accountNum = utils::unmarshalInt(p);
     p += length;
 
     length = utils::unmarshalInt(p);
-    p += 4;
+    p += INT_SIZE;
     passw = utils::unmarshalString(p,length);
     p += length;
 
     length = utils::unmarshalInt(p);
-    p += 4;
+    p += INT_SIZE;
     currency = utils::unmarshalInt(p);
     p += length;
     
     length = utils::unmarshalInt(p);
-    p += 4;
+    p += INT_SIZE;
     amount = utils::unmarshalFloat(p);
     p += length;
 
@@ -374,64 +414,72 @@ void Handler::service3(udp_server &server, char *p, int req_id, int status){
         else if(balance.first == -4) err = "Currency mismatch!";
         else err = "Unknown error!";
         
-        utils::marshalInt(4+1+4+(int)err.size(),header);
+        utils::marshalInt(ID_SIZE+STATUS_SIZE+INT_SIZE+(int)err.size(),header);
 
-        char *response = new char[4+1+4+(int)err.size()];
+        char *response = new char[ID_SIZE+STATUS_SIZE+INT_SIZE+(int)err.size()];
         char *cur = response;
 
         int responseID = getResponseID();
         utils::marshalInt(responseID,cur);
-        cur += 4;
+        cur += ID_SIZE;
 
         utils::marshalString(ACK_FAIL,cur);
-        cur += 1;
+        cur += STATUS_SIZE;
 
         utils::marshalInt((int)err.size(),cur);
-        cur += 4;
+        cur += INT_SIZE;
             
         utils::marshalString(err,cur);
         cur += (int)err.size();
 
-        if(status == 2) memo[{cAddress,req_id}] = string(response,4+1+4+(int)err.size());
+        if(status == 2) memo[{cAddress,req_id}] = string(response,ID_SIZE+STATUS_SIZE+INT_SIZE+(int)err.size());
 
-        sendReply(server,header,response,4+1+4+(int)err.size());
+        sendReply(server,header,response,ID_SIZE+STATUS_SIZE+INT_SIZE+(int)err.size());
         
-        if(status >= 1) ackHandler(server, header, response, 4+1+4+(int)err.size(), responseID, status, cAddress);
+        if(status >= 1) ackHandler(server, header, response, ID_SIZE+STATUS_SIZE+INT_SIZE+(int)err.size(), responseID, status, cAddress);
     }
     else{
-        char response[4+1+4+4+4+4];
+        char response[ID_SIZE+STATUS_SIZE+3*INT_SIZE+FLOAT_SIZE];
         char *cur = response;
 
-        utils::marshalInt(4+1+4+4+4+4,header);
+        utils::marshalInt(ID_SIZE+STATUS_SIZE+3*INT_SIZE+FLOAT_SIZE,header);
 
         int responseID = getResponseID();
         utils::marshalInt(responseID,cur);
-        cur += 4;
+        cur += ID_SIZE;
 
         utils::marshalString(ACK_SUCCESS,cur);
-        cur += 1;
+        cur += STATUS_SIZE;
 
-        utils::marshalInt(4,cur);
-        cur += 4;
+        utils::marshalInt(INT_SIZE,cur);
+        cur += INT_SIZE;
 
         utils::marshalInt(balance.first,cur);
-        cur += 4;
+        cur += INT_SIZE;
 
-        utils::marshalInt(4,cur);
-        cur += 4;
+        utils::marshalInt(FLOAT_SIZE,cur);
+        cur += INT_SIZE;
         
         utils::marshalFloat(balance.second,cur);
         
-        if(status == 2) memo[{cAddress,req_id}] = string(response,4+1+4+4+4+4);
+        if(status == 2) memo[{cAddress,req_id}] = string(response,ID_SIZE+STATUS_SIZE+3*INT_SIZE+FLOAT_SIZE);
 
-        sendReply(server,header,response,4+1+4+4+4+4);
+        sendReply(server,header,response,ID_SIZE+STATUS_SIZE+3*INT_SIZE+FLOAT_SIZE);
         
-        if(status >= 1) ackHandler(server, header, response, 4+1+4+4+4+4, responseID, status, cAddress);
+        if(status >= 1) ackHandler(server, header, response, ID_SIZE+STATUS_SIZE+3*INT_SIZE+FLOAT_SIZE, responseID, status, cAddress);
         
         notify(server,"Deposited " + to_string(amount) + " of currency " + to_string(currency) + " to account no. " + to_string(accountNum) + " (" + name + ") .", status);
     }
 }
 
+/**
+   Handles service 4 (withdraw):
+   1. unmarshal request
+   2. withdraws balance
+   3. marshals and sends response
+   4. handles ack
+   5. notifies monitoring users
+ */
 void Handler::service4(udp_server &server, char *p, int req_id, int status){
     unsigned long cAddress = server.getClientAddress().sin_addr.s_addr;
 
@@ -443,27 +491,27 @@ void Handler::service4(udp_server &server, char *p, int req_id, int status){
     string passw, name;
     
     int length = utils::unmarshalInt(p);
-    p += 4;
+    p += INT_SIZE;
     name = utils::unmarshalString(p,length);
     p += length;
 
     length = utils::unmarshalInt(p);
-    p += 4;
+    p += INT_SIZE;
     accountNum = utils::unmarshalInt(p);
     p += length;
 
     length = utils::unmarshalInt(p);
-    p += 4;
+    p += INT_SIZE;
     passw = utils::unmarshalString(p,length);
     p += length;
 
     length = utils::unmarshalInt(p);
-    p += 4;
+    p += INT_SIZE;
     currency = utils::unmarshalInt(p);
     p += length;
     
     length = utils::unmarshalInt(p);
-    p += 4;
+    p += INT_SIZE;
     amount = utils::unmarshalFloat(p);
     p += length;
 
@@ -480,65 +528,72 @@ void Handler::service4(udp_server &server, char *p, int req_id, int status){
         else if(balance.first == -15) err = "Unable to withdraw amount higher than balance!";
         else err = "Unknown error!";
         
-        utils::marshalInt(4+1+4+(int)err.size(),header);
+        utils::marshalInt(ID_SIZE+STATUS_SIZE+INT_SIZE+(int)err.size(),header);
 
-        char *response = new char[4+1+4+(int)err.size()];
+        char *response = new char[ID_SIZE+STATUS_SIZE+INT_SIZE+(int)err.size()];
         char *cur = response;
 
         int responseID = getResponseID();
         utils::marshalInt(responseID,cur);
-        cur += 4;
+        cur += ID_SIZE;
         
         utils::marshalString(ACK_FAIL,cur);
-        cur += 1;
+        cur += STATUS_SIZE;
 
         utils::marshalInt((int)err.size(),cur);
-        cur += 4;
+        cur += INT_SIZE;
             
         utils::marshalString(err,cur);
         cur += (int)err.size();
 
-        if(status == 2) memo[{cAddress,req_id}] = string(response,4+1+4+(int)err.size());
+        if(status == 2) memo[{cAddress,req_id}] = string(response,ID_SIZE+STATUS_SIZE+INT_SIZE+(int)err.size());
 
-        sendReply(server,header,response,4+1+4+(int)err.size());
+        sendReply(server,header,response,ID_SIZE+STATUS_SIZE+INT_SIZE+(int)err.size());
         
-        if(status >= 1) ackHandler(server, header, response, 4+1+4+(int)err.size(), responseID, status, cAddress);
+        if(status >= 1) ackHandler(server, header, response, ID_SIZE+STATUS_SIZE+INT_SIZE+(int)err.size(), responseID, status, cAddress);
 
     }
     else{
-        char response[4+1+4+4+4+4];
+        char response[ID_SIZE+STATUS_SIZE+3*INT_SIZE+FLOAT_SIZE];
         char *cur = response;
 
-        utils::marshalInt(4+1+4+4+4+4,header);
+        utils::marshalInt(ID_SIZE+STATUS_SIZE+3*INT_SIZE+FLOAT_SIZE,header);
 
         int responseID = getResponseID();
         utils::marshalInt(responseID,cur);
-        cur += 4;
+        cur += ID_SIZE;
         
         utils::marshalString(ACK_SUCCESS,cur);
-        cur += 1;
+        cur += STATUS_SIZE;
 
-        utils::marshalInt(4,cur);
-        cur += 4;
+        utils::marshalInt(INT_SIZE,cur);
+        cur += INT_SIZE;
 
         utils::marshalInt(balance.first,cur);
-        cur += 4;
+        cur += INT_SIZE;
 
-        utils::marshalInt(4,cur);
-        cur += 4;
+        utils::marshalInt(FLOAT_SIZE,cur);
+        cur += INT_SIZE;
         
         utils::marshalFloat(balance.second,cur);
 
-        if(status == 2) memo[{cAddress,req_id}] = string(response,4+1+4+4+4+4);
+        if(status == 2) memo[{cAddress,req_id}] = string(response,ID_SIZE+STATUS_SIZE+3*INT_SIZE+FLOAT_SIZE);
 
-        sendReply(server,header,response,4+1+4+4+4+4);
+        sendReply(server,header,response,ID_SIZE+STATUS_SIZE+3*INT_SIZE+FLOAT_SIZE);
         
-        if(status >= 1) ackHandler(server, header, response, 4+1+4+4+4+4, responseID, status, cAddress);
+        if(status >= 1) ackHandler(server, header, response, ID_SIZE+STATUS_SIZE+3*INT_SIZE+FLOAT_SIZE, responseID, status, cAddress);
         
         notify(server,"Withdrawn " + to_string(amount) + " of currency " + to_string(currency) + " from account no. " + to_string(accountNum) + " (" + name + ") .", status);
     }
 }
 
+/**
+   Handles service 5 (add new monitoring user):
+   1. unmarshal request
+   2. adds new monitoring user
+   3. marshals and sends response
+   4. handles ack
+ */
 void Handler::service5(udp_server &server, char *p, int req_id, int status){
     cout << "Beginning service 5\n";
     unsigned long cAddress = server.getClientAddress().sin_addr.s_addr;
@@ -546,23 +601,10 @@ void Handler::service5(udp_server &server, char *p, int req_id, int status){
     if(status == 2 && checkAndSendOldResponse(server,cAddress,req_id))
         return;
     
-    /*
-      ### Service 5 - Monitor updates to all updates made to all bank account
-
-      ##### Message
-      - Interval in milliseconds (Integer)
-
-      ##### Response
-      - Account Update
-      - Message Type
-      - Details
-     */
-    
-    int interval;
 
     int length = utils::unmarshalInt(p);
-    p += 4;
-    interval = utils::unmarshalInt(p);
+    p += INT_SIZE;
+    int interval = utils::unmarshalInt(p);
     p += length;
 
     cout << "Obtaining client info..\n";
@@ -581,33 +623,41 @@ void Handler::service5(udp_server &server, char *p, int req_id, int status){
     cout << "Marshalling\n";
 
     char header[HEADER_SIZE];
-    char response[4+1+4+4];
+    char response[ID_SIZE+STATUS_SIZE+2*INT_SIZE];
     char *cur = response;
-    utils::marshalInt(4+1+4+4,header);
+    utils::marshalInt(ID_SIZE+STATUS_SIZE+2*INT_SIZE,header);
 
     int responseID = getResponseID();
     utils::marshalInt(responseID,cur);
-    cur += 4;
+    cur += INT_SIZE;
 
     utils::marshalString(ACK_SUCCESS,cur);
-    cur += 1;
+    cur += STATUS_SIZE;
 
-    utils::marshalInt(4,cur);
-    cur += 4;
+    utils::marshalInt(INT_SIZE,cur);
+    cur += INT_SIZE;
     
     utils::marshalInt(newAdmin.getRemaining(),cur);
 
-    if(status == 2) memo[{cAddress,req_id}] = string(response,4+1+4+4);
+    if(status == 2) memo[{cAddress,req_id}] = string(response,ID_SIZE+STATUS_SIZE+2*INT_SIZE);
 
     cout << "Sending response\n";
 
-    sendReply(server,header,response,4+1+4+4);
+    sendReply(server,header,response,ID_SIZE+STATUS_SIZE+2*INT_SIZE);
     
     cout << "Handling ack\n";
     
-    if(status >= 1) ackHandler(server, header, response, 4+1+4+4, responseID, status, cAddress);
+    if(status >= 1) ackHandler(server, header, response, ID_SIZE+STATUS_SIZE+2*INT_SIZE, responseID, status, cAddress);
 }
 
+/**
+   Handles service 6 (transfer balance):
+   1. unmarshal request
+   2. transfer balance
+   3. marshals and sends response
+   4. handles ack
+   5. notifies monitoring users
+ */
 void Handler::service6(udp_server &server, char *p, int req_id, int status){
     unsigned long cAddress = server.getClientAddress().sin_addr.s_addr;
 
@@ -619,37 +669,37 @@ void Handler::service6(udp_server &server, char *p, int req_id, int status){
     string passw, name1, name2;
 
     int length = utils::unmarshalInt(p);
-    p += 4;
+    p += INT_SIZE;
     name1 = utils::unmarshalString(p,length);
     p += length;
     
     length = utils::unmarshalInt(p);
-    p += 4;
+    p += INT_SIZE;
     accountNum1 = utils::unmarshalInt(p);
     p += length;
 
     length = utils::unmarshalInt(p);
-    p += 4;
+    p += INT_SIZE;
     name2 = utils::unmarshalString(p,length);
     p += length;
 
     length = utils::unmarshalInt(p);
-    p += 4;
+    p += INT_SIZE;
     accountNum2 = utils::unmarshalInt(p);
     p += length;
 
     length = utils::unmarshalInt(p);
-    p += 4;
+    p += INT_SIZE;
     passw = utils::unmarshalString(p,length);
     p += length;
     
     length = utils::unmarshalInt(p);
-    p += 4;
+    p += INT_SIZE;
     currency = utils::unmarshalInt(p);
     p += length;
     
     length = utils::unmarshalInt(p);
-    p += 4;
+    p += INT_SIZE;
     amount = utils::unmarshalFloat(p);
     p += length;
 
@@ -676,63 +726,71 @@ void Handler::service6(udp_server &server, char *p, int req_id, int status){
         else if(balance.first == -27) err = "Recipient currency mismatch!";
         else err = "Unknown error!";
         
-        utils::marshalInt(4+1+4+(int)err.size(),header);
+        utils::marshalInt(ID_SIZE+STATUS_SIZE+INT_SIZE+(int)err.size(),header);
 
-        char *response = new char[4+1+4+(int)err.size()];
+        char *response = new char[ID_SIZE+STATUS_SIZE+INT_SIZE+(int)err.size()];
         char *cur = response;
 
         int responseID = getResponseID();
         utils::marshalInt(responseID,cur);
-        cur += 4;
+        cur += INT_SIZE;
         
         utils::marshalString(ACK_FAIL,cur);
-        cur += 1;
+        cur += STATUS_SIZE;
 
         utils::marshalInt((int)err.size(),cur);
-        cur += 4;
+        cur += INT_SIZE;
             
         utils::marshalString(err,cur);
         cur += (int)err.size();
 
-        if(status == 2) memo[{cAddress,req_id}] = string(response,4+1+4+(int)err.size());
+        if(status == 2) memo[{cAddress,req_id}] = string(response,ID_SIZE+STATUS_SIZE+INT_SIZE+(int)err.size());
 
-        sendReply(server,header,response,4+1+4+(int)err.size());
+        sendReply(server,header,response,ID_SIZE+STATUS_SIZE+INT_SIZE+(int)err.size());
         
-        if(status >= 1) ackHandler(server, header, response, 4+1+4+(int)err.size(), responseID, status, cAddress);
+        if(status >= 1) ackHandler(server, header, response, ID_SIZE+STATUS_SIZE+INT_SIZE+(int)err.size(), responseID, status, cAddress);
     }
     else{
-        char response[4+1+4+4+4+4];
+        char response[ID_SIZE+STATUS_SIZE+3*INT_SIZE+FLOAT_SIZE];
         char *cur = response;
 
         int responseID = getResponseID();
         utils::marshalInt(responseID,cur);
-        cur += 4;
+        cur += ID_SIZE;
 
         utils::marshalString(ACK_SUCCESS,cur);
-        cur += 1;
+        cur += STATUS_SIZE;
 
-        utils::marshalInt(4,cur);
-        cur += 4;
+        utils::marshalInt(INT_SIZE,cur);
+        cur += INT_SIZE;
 
         utils::marshalInt(balance.first,cur);
-        cur += 4;
+        cur += INT_SIZE;
 
-        utils::marshalInt(4,cur);
-        cur += 4;
+        utils::marshalInt(INT_SIZE,cur);
+        cur += INT_SIZE;
         
         utils::marshalFloat(balance.second,cur);
 
-        utils::marshalInt(4+1+4+4+4+4,header);
+        utils::marshalInt(ID_SIZE+STATUS_SIZE+3*INT_SIZE+FLOAT_SIZE,header);
 
-        if(status == 2) memo[{cAddress,req_id}] = string(response,4+1+4+4+4+4);
+        if(status == 2) memo[{cAddress,req_id}] = string(response,ID_SIZE+STATUS_SIZE+3*INT_SIZE+FLOAT_SIZE);
 
-        sendReply(server,header,response,4+1+4+4+4+4);
+        sendReply(server,header,response,ID_SIZE+STATUS_SIZE+3*INT_SIZE+FLOAT_SIZE);
         
-        if(status >= 1) ackHandler(server, header, response, 4+1+4+4+4+4, responseID, status, cAddress);
+        if(status >= 1) ackHandler(server, header, response, ID_SIZE+STATUS_SIZE+3*INT_SIZE+FLOAT_SIZE, responseID, status, cAddress);
         notify(server,"Transferred " + to_string(amount) + " of currency " + to_string(currency) + " from account no. " + to_string(accountNum1) + " (" + name1 + ") to account no. " + to_string(accountNum2) + " (" + name2 + ") .", status);
     }
 }
 
+/**
+   Handles service 7 (forget password):
+   1. unmarshal request
+   2. change password
+   3. marshals and sends response
+   4. handles ack
+   5. notifies monitoring users
+ */
 void Handler::service7(udp_server &server, char *p, int req_id, int status){
     unsigned long cAddress = server.getClientAddress().sin_addr.s_addr;
 
@@ -743,45 +801,45 @@ void Handler::service7(udp_server &server, char *p, int req_id, int status){
     string passw, newPassw, name;
 
     int length = utils::unmarshalInt(p);
-    p += 4;
+    p += INT_SIZE;
     name = utils::unmarshalString(p,length);
     p += length;
     
     length = utils::unmarshalInt(p);
-    p += 4;
+    p += INT_SIZE;
     accountNum = utils::unmarshalInt(p);
     p += length;
 
     length = utils::unmarshalInt(p);
-    p += 4;
+    p += INT_SIZE;
     passw = utils::unmarshalString(p,length);
     p += length;
 
     length = utils::unmarshalInt(p);
-    p += 4;
+    p += INT_SIZE;
     newPassw = utils::unmarshalString(p,length);
     p += length;
 
     bool success = acManager.changePassword(accountNum,name,passw,newPassw);
 
     char header[HEADER_SIZE];
-    char response[4+1];
+    char response[ID_SIZE+STATUS_SIZE];
 
-    utils::marshalInt(4+1,header);
+    utils::marshalInt(ID_SIZE+STATUS_SIZE,header);
     char *cur = response;
 
     int responseID = getResponseID();
     utils::marshalInt(responseID,cur);
-    cur += 4;
+    cur += ID_SIZE;
     
     if(success) utils::marshalString(ACK_SUCCESS,cur);
     else utils::marshalString(ACK_FAIL,cur);
 
-    if(status == 2) memo[{cAddress,req_id}] = string(response,4+1);
+    if(status == 2) memo[{cAddress,req_id}] = string(response,ID_SIZE+STATUS_SIZE);
 
-    sendReply(server,header,response,4+1);
+    sendReply(server,header,response,ID_SIZE+STATUS_SIZE);
 
-    if(status >= 1) ackHandler(server, header, response, 4+1, responseID, status, cAddress);
+    if(status >= 1) ackHandler(server, header, response, ID_SIZE+STATUS_SIZE, responseID, status, cAddress);
     
     notify(server,"Changed password of account no. " + to_string(accountNum) + " (" + name + ").", status);
 }
