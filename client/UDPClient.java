@@ -210,7 +210,6 @@ class UDPClient
      * @throws TimeoutException
      * @since 1.9
      */
-     */
     public byte[] sendAndReceive(byte[] packageByte, int curID) throws IOException, InterruptedException, TimeoutException{
         byte[] response = new byte[0];
         int timeoutCount = 0;
