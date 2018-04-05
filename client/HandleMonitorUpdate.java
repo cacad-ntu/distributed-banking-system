@@ -52,15 +52,18 @@ class HandleMonitorUpdate{
         return Utils.byteUnboxing(message);
     }
 
-    public static int handleResponse(byte[] response){
+    public static int handleResponse(byte[] response, boolean debug){
         String statusStr = Utils.unmarshalString(response, 0, Constants.RESPONSE_TYPE_SIZE);
         int status = Integer.parseInt(statusStr);
+        if (debug) System.out.printf("[DEBUG][HandleMonitorUpdate][Status = %d]\n", status);
         switch(status){
             case Constants.NAK:
+                if (debug) System.out.println("[DEBUG][HandleMonitorUpdate][Unsuccessful response]");
                 String errMsg = Utils.unmarshalMsgString(response, Constants.RESPONSE_TYPE_SIZE);
                 System.out.printf(Constants.ERR_MSG, errMsg);
                 return 0;
             case Constants.ACK:
+                if (debug) System.out.println("[DEBUG][HandleMonitorUpdate][Successful response]");
                 DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
                 LocalDateTime now = LocalDateTime.now();
 
