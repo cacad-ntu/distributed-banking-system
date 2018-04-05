@@ -9,9 +9,9 @@ int portno;
 char header[4];
 char *buffer;
 int message_length;
-Handler handler;
 double failureRate;
 int status;
+int limit;
 /*
 void send(udp_server &server){
     server.send(header,HEADER_SIZE);
@@ -19,7 +19,7 @@ void send(udp_server &server){
 }
 */
 
-void receive(udp_server &server){
+void receive(udp_server &server, Handler &handler){
     cout << "WAITING\n";
     int n = server.receive_time(header,HEADER_SIZE,10000);
 
@@ -76,7 +76,7 @@ void receive(udp_server &server){
 
 int main(int argc, char **argv){
     /*
-      <program> <port> <status> <failure>
+      <program> <port> <status> <failure> <limit>
      */
 
     if (argc < 2) portno = 8080;
@@ -88,11 +88,14 @@ int main(int argc, char **argv){
 
     failureRate = 0;
     if(argc >= 4) failureRate = (double)(atoi(argv[3])) / (double)100.0;
+
+    limit = -1;
+    if(argc >= 5) limit = atoi(argv[4]);
     
-    udp_server server(portno,failureRate);
-    handler = Handler();
+    udp_server server(portno);
+    Handler handler(limit, failureRate);
     while(true){
-        receive(server);
+        receive(server,handler);
     }
     return 0;
 }

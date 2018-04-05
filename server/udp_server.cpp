@@ -13,23 +13,19 @@ int udp_server::receive_time(char *buf, size_t bufsize, int timeout_in_seconds){
 }
 
 void udp_server::send(const char *buf, size_t bufsize){
-    if(distribution(generator) > failureRate)
-        sendto(sockfd, buf, bufsize, 0, (struct sockaddr *) &clientaddr, clientlen);
-    else cout << "Failure simulated.\n";
+    sendto(sockfd, buf, bufsize, 0, (struct sockaddr *) &clientaddr, clientlen);
 }
 
 void udp_server::send(const char *buf, size_t bufsize, struct sockaddr_in addr, unsigned len){
-    if(distribution(generator) > failureRate)
-        sendto(sockfd, buf, bufsize, 0, (struct sockaddr *) &addr, len);
-    else cout << "Failure simulated.\n";
+    sendto(sockfd, buf, bufsize, 0, (struct sockaddr *) &addr, len);
 }
 
-udp_server::udp_server(int port, double _failureRate){
+udp_server::udp_server(int port){
     portno = port;
     sockfd = socket(AF_INET, SOCK_DGRAM, 0);
 
     if (sockfd < 0){
-        perror("ERROR opening socket");
+        perror("Unable to open socket.");
         return;
     }
     
@@ -42,11 +38,6 @@ udp_server::udp_server(int port, double _failureRate){
         perror("ERROR on binding");
 
     clientlen = sizeof(clientaddr);
-    seed = chrono::system_clock::now().time_since_epoch().count();
-    generator = mt19937(seed);
-    distribution = uniform_real_distribution<double> (0.0,1.0);
-
-    failureRate = _failureRate;
 }
 
 struct sockaddr_in udp_server::getClientAddress(){
