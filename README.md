@@ -1,5 +1,9 @@
 # distributed-banking-system
-CZ4013 - Distributed System Assignment
+CZ4013 - Distributed System Assignment 1
+
+This project consolidates basic knowledge about interprocess communication and remote invocation through constructing client and server programs that use UDP as the transport protocol. The client and server programs are designed to simulate a distributed banking system.
+
+[Report](https://github.com/cacad-ntu/distributed-banking-system-report)
 
 
 
@@ -16,7 +20,7 @@ CZ4013 - Distributed System Assignment
 
 
 
-## How to compile
+## Getting Started
 
 
 ### Client (Java)
