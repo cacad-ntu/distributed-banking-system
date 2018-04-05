@@ -2,8 +2,8 @@
 #include "utils.h"
 #include "Handler.h"
 #include <iostream>
+#include "constants.h"
 using namespace std;
-#define HEADER_SIZE 4
 
 int portno;
 char header[4];
@@ -12,16 +12,13 @@ int message_length;
 double failureRate;
 int status;
 int limit;
-/*
-void send(udp_server &server){
-    server.send(header,HEADER_SIZE);
-    server.send(buffer,message_length);
-}
-*/
 
-void receive(udp_server &server, Handler &handler){
+/**
+   Handles incoming request from client
+ */
+void handleRequest(udp_server &server, Handler &handler){
     cout << "WAITING\n";
-    int n = server.receive_time(header,HEADER_SIZE,10000);
+    int n = server.receive_time(header,HEADER_SIZE,INF);
 
     if(n <= 0){
         cout << "RETURNING\n";
@@ -34,7 +31,7 @@ void receive(udp_server &server, Handler &handler){
     buffer = new char[message_length];
 
     cout << "Receiving message..\n";
-    n = server.receive_time(buffer,message_length,1);
+    n = server.receive_time(buffer,message_length,RECEIVE_TIMEOUT);
     cout << "Received.\n";
     
     if(n <= 0){
@@ -44,10 +41,10 @@ void receive(udp_server &server, Handler &handler){
     char *cur = buffer;
 
     int req_id = utils::unmarshalInt(cur);
-    cur+=4;
+    cur+=INT_SIZE;
     
     int type = utils::unmarshalInt(cur);
-    cur+=4;
+    cur+=INT_SIZE;
 
     switch(type){
     case 1:
@@ -91,11 +88,11 @@ int main(int argc, char **argv){
 
     limit = -1;
     if(argc >= 5) limit = atoi(argv[4]);
-    
+
     udp_server server(portno);
     Handler handler(limit, failureRate);
     while(true){
-        receive(server,handler);
+        handleRequest(server,handler);
     }
     return 0;
 }

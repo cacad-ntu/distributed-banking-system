@@ -5,12 +5,20 @@ AccountManager::AccountManager(){
     accounts.clear();
 }
 
+/**
+   Creates account under the given name, password, currency, and balance
+ */
 int AccountManager::createAccount(string name, string passw, int currency, float balance){
     int accountNumber = newID++;
 	accounts[accountNumber] = new Account(accountNumber,name,passw,currency,balance);
 	return accountNumber;
 }
 
+
+/**
+   Deletes account if given account exists.
+   Returns true if account exists, false otherwise.
+ */
 bool AccountManager::deleteAccount(int accountNumber, string name, string passw){
 	if(!accounts.count(accountNumber))
 		return false;
@@ -23,6 +31,10 @@ bool AccountManager::deleteAccount(int accountNumber, string name, string passw)
 	return true;
 }
 
+/**
+   Deposits balance if account exists.
+   Returns a pair consisting error code and new balance.
+ */
 pair<int,float> AccountManager::deposit(int accountNumber, string name, string passw, int currency, float amount){
 	if(!accounts.count(accountNumber))
         return {-1,-1};
@@ -40,6 +52,10 @@ pair<int,float> AccountManager::deposit(int accountNumber, string name, string p
     return ptr->addAmount(amount);
 }
 
+/**
+   Withdraws balance if account exists.
+   Returns a pair consisting error code and remaining balance.
+ */
 pair<int,float> AccountManager::withdraw(int accountNumber, string name, string passw, int currency, float amount){
 	if(!accounts.count(accountNumber))
         return {-11,-11};
@@ -60,6 +76,10 @@ pair<int,float> AccountManager::withdraw(int accountNumber, string name, string 
     return ptr->subtractAmount(amount);
 }
 
+/**
+   Performs balance transfer if account exists.
+   Returns a pair consisting error code and remaining balance.
+ */
 pair<int,float> AccountManager::transfer(int accountNum1, int accountNum2, string name1, string name2, string passw, int currency, float amount){
     if(!accounts.count(accountNum1))
         return {-21,-21};
@@ -95,6 +115,10 @@ pair<int,float> AccountManager::transfer(int accountNum1, int accountNum2, strin
     return balance;
 }
 
+/**
+   Changes account password and returns yes if account exists.
+   Returns false otherwise.
+ */
 bool AccountManager::changePassword(int accountNum, string name, string passw, string newPassw){
     if(!accounts.count(accountNum))
         return false;
