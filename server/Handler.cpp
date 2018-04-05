@@ -267,7 +267,7 @@ void Handler::service1(udp_server &server, char *p, int req_id, int status){
 
     sendReply(server,header,response,ID_SIZE+STATUS_SIZE+2*INT_SIZE);
     
-    if(status >= 1) ackHandler(server, header, response, ID_SIZE+STATUS_SIZE+2*INT_SIZE, responseID, status, cAddress);
+    if(status == 2) ackHandler(server, header, response, ID_SIZE+STATUS_SIZE+2*INT_SIZE, responseID, status, cAddress);
     
     notify(server,"Opened a new account with name " + name + ", currency " + to_string(currency) + ", balance " + to_string(balance) + ".", status);
 }
@@ -328,7 +328,7 @@ void Handler::service2(udp_server &server, char *p, int req_id, int status){
 
         sendReply(server,header,response,ID_SIZE+STATUS_SIZE);
         
-        if(status >= 1) ackHandler(server, header, response, ID_SIZE+STATUS_SIZE, responseID, status, cAddress);
+        if(status == 2) ackHandler(server, header, response, ID_SIZE+STATUS_SIZE, responseID, status, cAddress);
         
         notify(server,"Deleted account no. " + to_string(accountNum) + " (" + name + ").", status);
     }
@@ -358,7 +358,7 @@ void Handler::service2(udp_server &server, char *p, int req_id, int status){
 
         sendReply(server,header,response,ID_SIZE+STATUS_SIZE+INT_SIZE+(int)err.size());
         
-        if(status >= 1) ackHandler(server, header, response, ID_SIZE+STATUS_SIZE+INT_SIZE+(int)err.size(), responseID, status, cAddress);
+        if(status == 2) ackHandler(server, header, response, ID_SIZE+STATUS_SIZE+INT_SIZE+(int)err.size(), responseID, status, cAddress);
     }
 }
 
@@ -440,7 +440,7 @@ void Handler::service3(udp_server &server, char *p, int req_id, int status){
 
         sendReply(server,header,response,ID_SIZE+STATUS_SIZE+INT_SIZE+(int)err.size());
         
-        if(status >= 1) ackHandler(server, header, response, ID_SIZE+STATUS_SIZE+INT_SIZE+(int)err.size(), responseID, status, cAddress);
+        if(status == 2) ackHandler(server, header, response, ID_SIZE+STATUS_SIZE+INT_SIZE+(int)err.size(), responseID, status, cAddress);
     }
     else{
         char response[ID_SIZE+STATUS_SIZE+3*INT_SIZE+FLOAT_SIZE];
@@ -470,7 +470,7 @@ void Handler::service3(udp_server &server, char *p, int req_id, int status){
 
         sendReply(server,header,response,ID_SIZE+STATUS_SIZE+3*INT_SIZE+FLOAT_SIZE);
         
-        if(status >= 1) ackHandler(server, header, response, ID_SIZE+STATUS_SIZE+3*INT_SIZE+FLOAT_SIZE, responseID, status, cAddress);
+        if(status == 2) ackHandler(server, header, response, ID_SIZE+STATUS_SIZE+3*INT_SIZE+FLOAT_SIZE, responseID, status, cAddress);
         
         notify(server,"Deposited " + to_string(amount) + " of currency " + to_string(currency) + " to account no. " + to_string(accountNum) + " (" + name + ") .", status);
     }
@@ -555,7 +555,7 @@ void Handler::service4(udp_server &server, char *p, int req_id, int status){
 
         sendReply(server,header,response,ID_SIZE+STATUS_SIZE+INT_SIZE+(int)err.size());
         
-        if(status >= 1) ackHandler(server, header, response, ID_SIZE+STATUS_SIZE+INT_SIZE+(int)err.size(), responseID, status, cAddress);
+        if(status == 2) ackHandler(server, header, response, ID_SIZE+STATUS_SIZE+INT_SIZE+(int)err.size(), responseID, status, cAddress);
 
     }
     else{
@@ -586,7 +586,7 @@ void Handler::service4(udp_server &server, char *p, int req_id, int status){
 
         sendReply(server,header,response,ID_SIZE+STATUS_SIZE+3*INT_SIZE+FLOAT_SIZE);
         
-        if(status >= 1) ackHandler(server, header, response, ID_SIZE+STATUS_SIZE+3*INT_SIZE+FLOAT_SIZE, responseID, status, cAddress);
+        if(status == 2) ackHandler(server, header, response, ID_SIZE+STATUS_SIZE+3*INT_SIZE+FLOAT_SIZE, responseID, status, cAddress);
         
         notify(server,"Withdrawn " + to_string(amount) + " of currency " + to_string(currency) + " from account no. " + to_string(accountNum) + " (" + name + ") .", status);
     }
@@ -653,7 +653,7 @@ void Handler::service5(udp_server &server, char *p, int req_id, int status){
     
     cout << "Handling ack\n";
     
-    if(status >= 1) ackHandler(server, header, response, ID_SIZE+STATUS_SIZE+2*INT_SIZE, responseID, status, cAddress);
+    if(status == 2) ackHandler(server, header, response, ID_SIZE+STATUS_SIZE+2*INT_SIZE, responseID, status, cAddress);
 }
 
 /**
@@ -755,7 +755,7 @@ void Handler::service6(udp_server &server, char *p, int req_id, int status){
 
         sendReply(server,header,response,ID_SIZE+STATUS_SIZE+INT_SIZE+(int)err.size());
         
-        if(status >= 1) ackHandler(server, header, response, ID_SIZE+STATUS_SIZE+INT_SIZE+(int)err.size(), responseID, status, cAddress);
+        if(status == 2) ackHandler(server, header, response, ID_SIZE+STATUS_SIZE+INT_SIZE+(int)err.size(), responseID, status, cAddress);
     }
     else{
         char response[ID_SIZE+STATUS_SIZE+3*INT_SIZE+FLOAT_SIZE];
@@ -785,7 +785,7 @@ void Handler::service6(udp_server &server, char *p, int req_id, int status){
 
         sendReply(server,header,response,ID_SIZE+STATUS_SIZE+3*INT_SIZE+FLOAT_SIZE);
         
-        if(status >= 1) ackHandler(server, header, response, ID_SIZE+STATUS_SIZE+3*INT_SIZE+FLOAT_SIZE, responseID, status, cAddress);
+        if(status == 2) ackHandler(server, header, response, ID_SIZE+STATUS_SIZE+3*INT_SIZE+FLOAT_SIZE, responseID, status, cAddress);
         notify(server,"Transferred " + to_string(amount) + " of currency " + to_string(currency) + " from account no. " + to_string(accountNum1) + " (" + name1 + ") to account no. " + to_string(accountNum2) + " (" + name2 + ") .", status);
     }
 }
@@ -847,7 +847,7 @@ void Handler::service7(udp_server &server, char *p, int req_id, int status){
 
     sendReply(server,header,response,ID_SIZE+STATUS_SIZE);
 
-    if(status >= 1) ackHandler(server, header, response, ID_SIZE+STATUS_SIZE, responseID, status, cAddress);
+    if(status == 2) ackHandler(server, header, response, ID_SIZE+STATUS_SIZE, responseID, status, cAddress);
     
     notify(server,"Changed password of account no. " + to_string(accountNum) + " (" + name + ").", status);
 }
