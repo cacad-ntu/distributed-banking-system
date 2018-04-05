@@ -72,7 +72,7 @@ void Handler::notify(udp_server &server, string notif, int status){
         server.send(header,HEADER_SIZE,admin.getAddress(),admin.getLength());
         server.send(response,ID_SIZE + STATUS_SIZE + 3*INT_SIZE + (int)notif.size(),admin.getAddress(),admin.getLength());
 
-        if(status >= 1){
+        if(status == 2){
             while(admin.isAvailable()){
                 char ackHeader[HEADER_SIZE];
 
