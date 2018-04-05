@@ -290,7 +290,6 @@ class UDPClient
 
         try {
             cmd = parser.parse(options, args);
-            System.out.println(cmd.getParsedOptionValue("failurerate"));
             host = cmd.getOptionValue("host");
             port = Integer.parseInt(cmd.getOptionValue("port"));
             atLeastOnce = cmd.hasOption("atleast");
