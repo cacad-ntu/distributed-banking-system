@@ -716,7 +716,7 @@ void Handler::service6(udp_server &server, char *p, int req_id, int status){
         else if(balance.first == -12) err = "Wrong name!";
         else if(balance.first == -13) err = "Wrong password!";
         else if(balance.first == -14) err = "Currency mismatch!";
-        else if(balance.first == -15) err = "Unable to withdraw amount higher than balance!";
+        else if(balance.first == -15) err = "Unable to transfer amount higher than balance!";
         else if(balance.first == -21) err = "Account number not found!";
         else if(balance.first == -22) err = "Account number of recipient not found!";
         else if(balance.first == -23) err = "Wrong name!";
