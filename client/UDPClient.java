@@ -167,7 +167,7 @@ class UDPClient
             responseID = Utils.unmarshalInteger(receivePacket.getData(), 0);
 
             if (this.debug) System.out.printf("[DEBUG][UPDClient][RECEIVE RESPONSE: %d]\n", responseID);
-            if (this.semInvo >= Constants.AT_LEAST_ONE_SEM_INVO && this.handledResponse.containsKey(responseID)){
+            if (this.semInvo >= Constants.AT_MOST_ONE_SEM_INVO && this.handledResponse.containsKey(responseID)){
                 if (this.debug) System.out.printf("[DEBUG][UPDClient][SEND ACK: %d]\n", responseID);
                 this.sendACK(responseID);
             }else{
@@ -175,7 +175,7 @@ class UDPClient
             }
         } while(this.semInvo >= Constants.AT_MOST_ONE_SEM_INVO);
 
-        if(this.getSemInvo() >= Constants.AT_LEAST_ONE_SEM_INVO){
+        if(this.getSemInvo() >= Constants.AT_MOST_ONE_SEM_INVO){
             if (this.debug) System.out.printf("[DEBUG][UPDClient][SEND ACK: %d]\n", responseID);
             this.sendACK(responseID);
         }
