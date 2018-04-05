@@ -4,7 +4,22 @@ import java.io.*;
 import java.lang.*;
 import java.util.*;
 
+/**
+ * The static classto handle "Transfer Money" request
+ * - createMessage()
+ * - construcMessage()
+ * - handleResponse()
+ */
 class HandleTransferMoney{
+
+    /**
+     * Create message for transfering money by asking user input (name, account number, recipient name, recipient account number, password, currency, and balance)
+     * @param scanner {@code Scanner} used to get user input
+     * @param id {@code int} id of the request created
+     * @return {@code byte[]}, the constructed message
+     * @throws UnsupportedEncodingException
+     * @since 1.9
+     */
     public static byte[] createMessage(Scanner scanner, int id)throws UnsupportedEncodingException{
         System.out.println(Constants.SEPARATOR);
         System.out.println(Constants.TRANSFER_MSG);
@@ -78,6 +93,19 @@ class HandleTransferMoney{
         return new byte[0];
     }
 
+    /**
+     * Getting user confirmation about the entered detail
+     * @param name {@code String}
+     * @param accountNumber {@code int}
+     * @param recipientName {@code String}
+     * @param resipientAccountNumber {@code int}
+     * @param password {@code String}
+     * @param currency {@code int}
+     * @param balance {@code float}
+     * @param scanner {@code Scanner}
+     * @return {@code boolean} The confirmatiion
+     * @since 1.9
+     */
     public static boolean confirm(String name, int accountNumber, String recipientName, int recipientAccountNumber, String password, int currency, float balance, Scanner scanner){
         System.out.println(Constants.SEPARATOR);
         System.out.println(Constants.CONFIRM_SUMMARY);
@@ -99,6 +127,20 @@ class HandleTransferMoney{
         }
     }
 
+    /**
+     * Constructing message based on user input
+     * @param name {@code String}
+     * @param accountNumber {@code int}
+     * @param recipientName {@code String}
+     * @param recipientAccountNumber {@code int}
+     * @param password {@code String}
+     * @param currency {@code int}
+     * @param balance {@code float}
+     * @param id {@code int} Id of the request
+     * @return {@code boolean} The confirmatiion
+     * @throws UnsupportedEncodingException
+     * @since 1.9
+     */
     public static byte[] constructMessage(String name, int accountNumber, String recipientName, int recipientAccountNumber, String password, int currency, float balance, int id)throws UnsupportedEncodingException{
         List message = new ArrayList();
 
@@ -115,6 +157,13 @@ class HandleTransferMoney{
         return Utils.byteUnboxing(message);
     }
 
+    /**
+     * Handling server response (unmarshall response and shows to user)
+     * @param response {@code byte[]} byte response from server (without header length and response id)
+     * @param debug {@code boolean} flag whether to print debug message or not
+     * @return {@code void}
+     * @since 1.9
+     */
     public static void handleResponse(byte[] response, boolean debug){
         System.out.println(Constants.SEPARATOR);
         String statusStr = Utils.unmarshalString(response, 0, Constants.RESPONSE_TYPE_SIZE);

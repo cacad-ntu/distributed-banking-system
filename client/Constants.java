@@ -1,5 +1,8 @@
 package client;
 
+/**
+ * Constants class, contains all constant used in the client
+ */
 class Constants{
     // Argument Constant
     public static final String DEFAULT_HOST = "127.0.0.1";

@@ -6,7 +6,22 @@ import java.util.*;
 import java.time.format.DateTimeFormatter;
 import java.time.LocalDateTime;
 
+/**
+ * The static classto handle "Monitor Update" request
+ * - createMessage()
+ * - construcMessage()
+ * - handleResponse()
+ */
 class HandleMonitorUpdate{
+
+    /**
+     * Create message for monitoring updates by asking user input (duration)
+     * @param scanner {@code Scanner} used to get user input
+     * @param id {@code int} id of the request created
+     * @return {@code byte[]}, the constructed message
+     * @throws UnsupportedEncodingException
+     * @since 1.9
+     */
     public static byte[] createMessage(Scanner scanner, int id)throws UnsupportedEncodingException{
         System.out.println(Constants.SEPARATOR);
         System.out.println(Constants.MONITOR_MSG);
@@ -27,6 +42,13 @@ class HandleMonitorUpdate{
         return new byte[0];
     }
 
+    /**
+     * Getting user confirmation about the entered detail
+     * @param duration {@code int} duration in milliseconds
+     * @param scanner {@code Scanner}
+     * @return {@code boolean} The confirmatiion
+     * @since 1.9
+     */
     public static boolean confirm(int duration, Scanner scanner){
         System.out.println(Constants.SEPARATOR);
         System.out.println(Constants.CONFIRM_SUMMARY);
@@ -42,6 +64,14 @@ class HandleMonitorUpdate{
         }
     }
 
+    /**
+     * Constructing message based on user input
+     * @param duration {@code int} duration in milliseconds
+     * @param id {@code int} Id of the request
+     * @return {@code boolean} The confirmatiion
+     * @throws UnsupportedEncodingException
+     * @since 1.9
+     */
     public static byte[] constructMessage(int duration, int id)throws UnsupportedEncodingException{
         List message = new ArrayList();
 
@@ -52,6 +82,13 @@ class HandleMonitorUpdate{
         return Utils.byteUnboxing(message);
     }
 
+    /**
+     * Handling server response (unmarshall response and shows to user)
+     * @param response {@code byte[]} byte response from server (without header length and response id)
+     * @param debug {@code boolean} flag whether to print debug message or not
+     * @return {@code void}
+     * @since 1.9
+     */
     public static int handleResponse(byte[] response, boolean debug){
         String statusStr = Utils.unmarshalString(response, 0, Constants.RESPONSE_TYPE_SIZE);
         int status = Integer.parseInt(statusStr);

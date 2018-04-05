@@ -8,6 +8,9 @@ import java.util.concurrent.TimeoutException;
 
 import org.apache.commons.cli.*;
 
+/**
+ * Main class for UDP Client
+ */
 class UDPClient
 {
     private DatagramSocket clientSocket;
@@ -21,6 +24,16 @@ class UDPClient
     private Map<Integer, Boolean> handledResponse;
     private boolean debug;
 
+    /**
+     * Initialize UDPClient
+     * @param ip {@code String} Server IP address
+     * @param port {@code int} Server port number
+     * @param debug {@code boolean} Flag to print debug message
+     * @return {@code UDPClient}
+     * @throws SocketException
+     * @throws UnknownHostException
+     * @since 1.9
+     */
     public UDPClient(String ip, int port, boolean debug) throws SocketException, UnknownHostException{
         this.clientSocket = new DatagramSocket();
         this.setTimeout(Constants.DEFAULT_NO_TIMEOUT, Constants.DEFAULT_MAX_TIMEOUT);
@@ -34,38 +47,88 @@ class UDPClient
         this.debug = debug;
     }
 
+    /**
+     * Setting failure rate
+     * @param failureRate {@code double}
+     * @return {@code void}
+     * @since 1.9
+     */
     public void setFailureRate(double failureRate){
         this.failureRate = failureRate;
     }
 
+    /**
+     * Setting semantic invocation
+     * @param semInvo {@code int}
+     * @return {@code void}
+     * @since 1.9
+     */
     public void setSemInvo(int semInvo){
         this.semInvo = semInvo;
     }
 
+    /**
+     * Setting timeout
+     * @param timeout {@code int}
+     * @return {@code void}
+     * @throws SocketException
+     * @since 1.9
+     */
     public void setTimeout(int timeout) throws SocketException{
         clientSocket.setSoTimeout(timeout);
         this.timeout = timeout;
     }
 
+    /**
+     * Setting timeout and maximum timeout
+     * @param timeout {@code int}
+     * @param maxTimeout {@code int}
+     * @return {@code void}
+     * @throws SocketException
+     * @since 1.9
+     */
     public void setTimeout(int timeout, int maxTimeout) throws SocketException{
         clientSocket.setSoTimeout(timeout);
         this.timeout = timeout;
         this.maxTimeout = maxTimeout;
     }
 
+    /**
+     * Get new ID and increment global ID
+     * @return {@code int} new ID
+     * @since 1.9
+     */
     public int getID(){
         this.idCounter++;
         return this.idCounter;
     }
 
+    /**
+     * Get current invocation semantic used
+     * @return {@code int} invocation semantic
+     * @since 1.9
+     */
     public int getSemInvo(){
         return this.semInvo;
     }
 
+    /**
+     * Get current timeout used
+     * @return {@code int} timeout
+     * @since 1.9
+     */
     public int getTimeout(){
         return this.timeout;
     }
 
+    /**
+     * Send message (in bytes) to server
+     * @param message {@code byte[]}
+     * @return {@code void}
+     * @throws IOException
+     * @throws InterruptedException
+     * @since 1.9
+     */
     public void send(byte[] message) throws IOException, InterruptedException{
         if (Math.random() < this.failureRate){
             if (this.debug) System.out.println("[DEBUG][UPDClient][SIMULATING SENDING FAILURE ...]");
@@ -80,6 +143,13 @@ class UDPClient
         this.clientSocket.send(sendPacket);
     }
 
+    /**
+     * Receive message from server, send ACK if success
+     * @return {@code byte[]} response message from server
+     * @throws IOException
+     * @throws InterruptedException
+     * @since 1.9
+     */
     public byte[] receive() throws IOException, InterruptedException{
         int responseID;
         int messageLength;
@@ -114,6 +184,14 @@ class UDPClient
         return Arrays.copyOfRange(receivePacket.getData(), Constants.INT_SIZE, messageLength);
     }
 
+    /**
+     * Sending ACK to server
+     * @param curID {@code int} response id where the ACK is intended
+     * @return {@code void}
+     * @throws IOException
+     * @throws InterruptedException
+     * @since 1.9
+     */
     public void sendACK(int curID) throws IOException, InterruptedException{
         List message = new ArrayList();
         Utils.append(message, curID);
@@ -122,6 +200,17 @@ class UDPClient
         this.send(Utils.byteUnboxing(message));
     }
 
+    /**
+     * Sending request to server and wait for the response then send ACK
+     * @param packageByte {@code byte[]}
+     * @param curID {@code int} ID associated with the request
+     * @return {@code byte[]} response message from server
+     * @throws IOException
+     * @throws InterruptedException
+     * @throws TimeoutException
+     * @since 1.9
+     */
+     */
     public byte[] sendAndReceive(byte[] packageByte, int curID) throws IOException, InterruptedException, TimeoutException{
         byte[] response = new byte[0];
         int timeoutCount = 0;
@@ -142,6 +231,17 @@ class UDPClient
         return response;
     }
 
+    /**
+     * Main method
+     * Parse Argument
+     * Route service to the correspondent handler
+     * Send request and wait for response
+     * Give response to correspondent handler
+     * @param args {@code String[]}
+     * @return {@code void}
+     * @throws Exception
+     * @since 1.9
+     */
     public static void main(String[] args)throws Exception{
         Options options = new Options();
 
